@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.16)
+
+project(computorv1)
+
+target_sources(computorv1 PUBLIC main.cpp)
