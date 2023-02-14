@@ -8,17 +8,21 @@ add_subdirectory(src)
 
 # compile configuration
 
-add_library(compiler_flags INTERFACE)
+add_library(compile_flags INTERFACE)
 
-target_compile_features(compiler_flags INTERFACE cxx_std_14)
+target_compile_features(compile_flags INTERFACE cxx_std_14)
 
 set(gcc_like_cxx "$<COMPILE_LANG_AND_ID:ARMClang,AppleClang,Clang,GNU,LCC>")
 set(msvc_cxx "$<COMPILE_LANG_AND_ID:CXX,MSVC>")
 
-target_compile_options(compiler_flags INTERFACE 
+target_compile_options(compile_flags INTERFACE 
   "$<${gcc_like_cxx}:$<BUILD_INTERFACE:-Wall;-Wextra;-Wshadow;-Wformat=2;-Wunused>>"
   "$<${msvc_cxx}:$<BUILD_INTERFACE:-W3>>")
-  
+
+target_link_libraries(computorv1 compile_flags)
+
+# googletest
+
 include(FetchContent)
 
 FetchContent_Declare(
@@ -34,5 +38,3 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_subdirectory(tests)
-
-
