@@ -12,7 +12,7 @@
 // }
 
 struct Token {
-  using val_t = std::variant<std::monostate, double, std::string>;
+  using val_t = std::variant<std::monostate, double, char>;
 
   enum class Kind : char {
     END = 0,

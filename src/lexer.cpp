@@ -26,13 +26,13 @@ Token Lexer::number() {
   m_scanner >> d;
   return Token{Token::Kind::NUMBER, d};
 }
-
+/*
 Token Lexer::variable(char ch) {
   std::string s{ch};
   while (std::isalpha(ch = m_scanner.get())) s += ch;
   if (m_scanner.good()) m_scanner.unget();  // don't unget when eof
   return Token{Token::Kind::VARIABLE, s};
-}
+} */
 
 Token Lexer::get(void) {
   if (m_full) {
@@ -58,7 +58,8 @@ Token Lexer::get(void) {
         if (std::isdigit(ch)) {
           return number();
         } else if (std::isalpha(ch)) {
-          return variable(ch);
+          return Token{Token::Kind::VARIABLE, ch};
+          // return variable(ch);
         } else if (m_scanner.eof()) {
           return Token{Token::Kind::END};
         } else {

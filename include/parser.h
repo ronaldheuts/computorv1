@@ -1,32 +1,15 @@
 #pragma once
 
+#include <algorithm>
 #include <map>
 #include <memory>
+#include <set>
 #include <string_view>
 #include <vector>
 
 #include "lexer.h"
-
-struct Factor {
-  char variable;
-  int exponent;
-};
-
-struct Term {
-  Term(const double c, const std::string v, const int e);
-  Term(const double c, const std::string &v);
-  Term(const std::string &v);
-
-  double coefficient;
-  std::string variable;
-  int exponent;
-
-  std::vector<Factor> vars;  // X^2
-};
-
-Term operator*(const Term &a, const Term &b);
-Term operator+(const Term &a, const Term &b);
-Term operator-(const Term &a, const Term &b);
+#include "term.h"
+#include "visitors.h"
 
 /* Nodes */
 
@@ -52,46 +35,11 @@ struct UnaryExpr {
 };
 
 struct Var {
-  std::string value;
+  char value;
 };
 
 struct Num {
   double value;
-};
-
-/* Visitors */
-
-struct PrintVisitor {
-  void operator()(const BinaryExpr &expr) const;
-  void operator()(const UnaryExpr &expr) const;
-  void operator()(const Var &expr) const;
-  void operator()(const Num &expr) const;
-};
-
-struct CalcVisitor {
-  using val_t = Token::val_t;
-
-  val_t operator()(const BinaryExpr &expr) const;
-  val_t operator()(const UnaryExpr &expr) const;
-  val_t operator()(const Var &expr) const;
-  val_t operator()(const Num &expr) const;
-};
-
-struct RpnVisitor {
-  using val_t = Token::val_t;
-
-  RpnVisitor(void);
-
-  std::vector<val_t> operands;
-  std::vector<Term> terms;
-
-  void evaluate(const BinaryExpr &expr);
-  void evaluate(const UnaryExpr &expr);
-
-  void operator()(const BinaryExpr &expr);
-  void operator()(const UnaryExpr &expr);
-  void operator()(const Var &expr);
-  void operator()(const Num &expr);
 };
 
 /* Tree */

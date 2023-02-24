@@ -7,4 +7,6 @@ target_sources(computorv1 PUBLIC
   lexer.cpp
   parser.cpp
   token.cpp
+  term.cpp
+  visitors.cpp
 )
