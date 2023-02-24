@@ -10,7 +10,7 @@ add_subdirectory(src)
 
 add_library(compile_flags INTERFACE)
 
-target_compile_features(compile_flags INTERFACE cxx_std_14)
+target_compile_features(compile_flags INTERFACE cxx_std_17)
 
 set(gcc_like_cxx "$<COMPILE_LANG_AND_ID:ARMClang,AppleClang,Clang,GNU,LCC>")
 set(msvc_cxx "$<COMPILE_LANG_AND_ID:CXX,MSVC>")
