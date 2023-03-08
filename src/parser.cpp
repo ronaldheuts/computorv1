@@ -16,6 +16,21 @@ about their mistakes.
 
 https://gist.github.com/wolfsage/3996187
 https://rosettacode.org/wiki/Parsing/RPN_calculator_algorithm#C++
+https://mdkrajnak.github.io/ebnftest/
+
+<equation> ::= <expression> "=" <expression> | <expression>
+<expression> ::= <expression> "-" <factor> | <expression> "+" <factor> | <factor>
+<factor> ::= <factor> "*" <power> | <factor> "/" <power> | <power>
+<power> ::= <power> "^" <int> | <unary>
+<unary> ::= "-" <term> | <term>
+<term> ::= <num> "*" <var> "^" <int> | <num>
+<num> ::= <int> | <float>
+<float> ::= <int> "." <int> | <int> "."
+<int> ::= <int> <digit> | <digit>
+<var> ::= #'[a-z]'+ | #'[A-Z]'+
+<digit> ::= #'[0-9]'+
+
+==========================
 
 <equation> ::= <expression> "=" <expression> | <expression>
 
