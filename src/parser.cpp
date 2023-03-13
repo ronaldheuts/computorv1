@@ -113,6 +113,15 @@ std::unique_ptr<Parser::node_t> Parser::primary(void) {
   }
 }
 
+std::unique_ptr<Parser::node_t> Parser::term(void) {
+  std::unique_ptr<node_t> expr = primary();
+
+  if (check(peek(), Token::Kind::ASTERISK)) {
+    Token::Kind current = peek().kind;
+    advance();
+  }
+}
+
 std::unique_ptr<Parser::node_t> Parser::unary(void) {
   if (check(peek(), Token::Kind::MINUS)) {
     Token::Kind current = peek().kind;
@@ -120,7 +129,7 @@ std::unique_ptr<Parser::node_t> Parser::unary(void) {
     std::unique_ptr<node_t> expr = unary();
     return std::make_unique<node_t>(UnaryExpr{current, expr});
   }
-  return primary();
+  return term();
 }
 
 std::unique_ptr<Parser::node_t> Parser::power(void) {

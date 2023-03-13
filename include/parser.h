@@ -81,6 +81,7 @@ class Parser {
   Token advance(void);
 
   [[nodiscard]] std::unique_ptr<node_t> primary(void);
+  [[nodiscard]] std::unique_ptr<node_t> term(void);
   [[nodiscard]] std::unique_ptr<node_t> unary(void);
   [[nodiscard]] std::unique_ptr<node_t> factor(void);
   [[nodiscard]] std::unique_ptr<node_t> power(void);
