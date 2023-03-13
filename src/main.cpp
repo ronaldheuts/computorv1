@@ -1,12 +1,17 @@
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 
-#include "../include/parser.h"
+#include "parser.h"
 
 /*
 1. check exceptions - are they the right ones
 2. be specific with user errors - where did it go wrong
 */
+
+// "5 * X^0 + 4 * X^1 - 9.3 * X^2 = 1 * X^0"
+// "5 * X^0 + 4 * X^1 = 4 * X^0"
+// "8 * X^0 - 6 * X^1 + 0 * X^2 - 5.6 * X^3 = 3 * X^0"
 
 int main(int argc, char *argv[]) try {
   Parser par;
@@ -16,9 +21,18 @@ int main(int argc, char *argv[]) try {
   } else if (argc == 2) {
     par.stream(argv[1]);
   } else {
-    throw(std::invalid_argument("usage: ./computorv1 [string]"));
+    throw(std::invalid_argument("usage: ./computorv1 [equation]"));
   }
   par.parse();
+
+  // auto res = utils::quadratic_formula(1, 0, 8);
+  // if ((*res).empty()) {
+  //   std::cout << "negative discriminant is not supported";
+  // }
+  // for (const auto &x : *res) {
+  //   std::cout << x << " ";
+  // }
+  // std::cout << '\n';
 
   return 0;
 } catch (std::exception &e) {

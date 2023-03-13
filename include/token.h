@@ -7,7 +7,7 @@
 #include <variant>
 
 // std::istream& operator>>(std::istream& is, Term& t) {
-//   is >> t.coefficient >> t.variable >> t.exponent;
+//   is >> t.coe >> t.variable >> t.exponent;
 //   return is;
 // }
 

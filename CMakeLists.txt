@@ -21,6 +21,8 @@ target_compile_options(compile_flags INTERFACE
 
 target_link_libraries(computorv1 compile_flags)
 
+include_directories(include)
+
 # googletest
 
 include(FetchContent)

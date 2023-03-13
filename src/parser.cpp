@@ -1,4 +1,4 @@
-#include "../include/parser.h"
+#include "parser.h"
 
 /*
 
@@ -69,15 +69,6 @@ UnaryExpr::UnaryExpr(Token::Kind k, std::unique_ptr<node_t>& c)
 /* Tree */
 
 void Tree::root(std::unique_ptr<node_t>& r) { m_root = std::move(r); }
-
-double powerof(double base, int exponent) {
-  double result{base};
-
-  for (int i = 0; i < exponent - 1; ++i) {
-    result *= base;
-  }
-  return result;
-}
 
 /* Parser */
 
@@ -202,28 +193,38 @@ std::unique_ptr<Parser::node_t> Parser::equation(void) {
   for (auto& x : terms) {
     auto it = polynomial.find(std::make_pair(x.variable, x.exponent));
     if (it != polynomial.end()) {
-      it->second.coefficient += x.coefficient;
+      it->second.coe += x.coe;
     } else {
       polynomial.insert(
           std::make_pair(std::make_pair(x.variable, x.exponent), x));
     }
   }
   for (auto& x : polynomial) {
-    std::cout << x.second.coefficient << " ";
+    std::cout << x.second.coe << " ";
     if (!isConstant(x.second))
       std::cout << "* " << x.second.variable << "^" << x.second.exponent << " ";
   }
   std::cout << "= 0\n";
 } */
 
-void printTerms(std::vector<Term>& terms) {
+std::map<std::pair<char, int>, Term> reduce(const std::vector<Term>& terms) {
+  std::map<std::pair<char, int>, Term> reduced;
+  for (const auto& term : terms) {
+    auto [it, success] = reduced.insert(
+        std::make_pair(std::make_pair(term.var, term.exp), term));
+    if (!success) {
+      it->second += term;
+    }
+  }
+  return reduced;
+}
+
+void printTerms(const std::vector<Term>& terms) {
   std::cout << "number of terms: " << terms.size() << "\n";
   for (auto& x : terms) {
-    std::cout << "[ " << x.coefficient;
-    if (!x.vars.empty()) {
-      for (const auto& i : x.vars) {
-        std::cout << " * " << i.variable << " ^ " << i.exponent << " ";
-      }
+    std::cout << "[ " << x.coe;
+    if (x.var) {
+      std::cout << " * " << x.var << " ^ " << x.exp;
     }
     std::cout << " ]\n";
   }
@@ -239,12 +240,40 @@ void Parser::parse(void) {
 
   printTerms(rpn.terms);
 
-  /*   if (!solvable(rpn.terms)) {
-      throw(std::runtime_error(
-          "The polynomial degree is strictly greater than 2, I can't solve."));
-    } */
-  // reduceTerms(rpn.terms);
+  auto reduced = reduce(rpn.terms);
+
+  for (const auto& term : reduced) {
+    if (term.second.coe < 0) {
+      std::cout << "- " << -term.second.coe;
+    } else {
+      std::cout << "+ " << term.second.coe;
+    }
+    if (term.second.var) {
+      std::cout << " * " << term.second.var;
+    }
+    if (term.second.exp) {
+      std::cout << " ^ " << term.second.exp;
+    } else {
+      // std::cout << " ^ 0";
+    }
+    std::cout << " ";
+  }
+  std::cout << "\n";
 }
+
+// for (auto& x : rpn.reduced) {
+//   std::cout << "[ " << x.second.coe;
+//   if (x.second.var) {
+//     std::cout << " * " << x.second.var << " ^ " << x.second.exp;
+//   }
+//   std::cout << " ]\n";
+// }
+
+/*   if (!solvable(rpn.terms)) {
+    throw(std::runtime_error(
+        "The polynomial degree is strictly greater than 2, I can't solve."));
+  } */
+// reduceTerms(rpn.terms);
 
 std::string Parser::prompt(void) {
   std::string equation;

@@ -9,4 +9,5 @@ target_sources(computorv1 PUBLIC
   token.cpp
   term.cpp
   visitors.cpp
+  utils.cpp
 )
