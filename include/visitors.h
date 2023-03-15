@@ -13,6 +13,7 @@ struct BinaryExpr;
 struct UnaryExpr;
 struct Var;
 struct Num;
+struct Term;
 
 struct PrintVisitor {
   int height;
@@ -22,6 +23,7 @@ struct PrintVisitor {
 
   void operator()(const BinaryExpr &expr);
   void operator()(const UnaryExpr &expr);
+  void operator()(const Term &expr);
   void operator()(const Var &expr);
   void operator()(const Num &expr);
 };
@@ -32,13 +34,14 @@ struct RpnVisitor {
   RpnVisitor();
 
   std::vector<Term> terms;
-  std::map<std::tuple<char, int>, Term> reduced;
+  std::map<std::pair<char, int>, std::pair<Token::Kind, Term>> reduced;
 
   void evaluate(const BinaryExpr &expr);
   void evaluate(const UnaryExpr &expr);
 
   void operator()(const BinaryExpr &expr);
   void operator()(const UnaryExpr &expr);
+  void operator()(const Term &expr);
   void operator()(const Var &expr);
   void operator()(const Num &expr);
 };

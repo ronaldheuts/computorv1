@@ -41,6 +41,20 @@ Term& Term::operator+=(const Term& a) {
   return *this;
 }
 
+Term Term::operator-() const {
+  Term term{*this};
+  term.coe = -term.coe;
+  return term;
+}
+
+std::ostream& operator<<(std::ostream& os, const Term& a) {
+  os << a.coe;
+  if (std::isalpha(a.var)) {
+    os << " * " << a.var << " ^ " << a.exp;
+  }
+  return os;
+}
+
 Term operator+(const Term& a, const Term& b) {
   if (likeTerms(a, b)) {
     return Term{a.coe + b.coe, a.var, a.exp};
@@ -79,4 +93,8 @@ Term operator/(const Term& a, const Term& b) {
 
 bool operator<(const Term& a, const Term& b) {
   return a.var < b.var || a.exp < b.exp;
+}
+
+bool operator==(const Term& a, const Term& b) {
+  return a.coe == b.coe && a.var == b.var && a.exp == b.exp;
 }

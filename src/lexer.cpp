@@ -14,34 +14,27 @@
 
 /* Lexer */
 
-Lexer::Lexer() : m_scanner{} {}
+Lexer::Lexer() : scanner{}, buffer{}, full{false} {}
 
-Lexer::Lexer(const std::string &s) : m_scanner{s} {}
+Lexer::Lexer(const std::string &s) : scanner{s}, buffer{}, full{false} {}
 
-void Lexer::stream(const std::string &s) { m_scanner = std::istringstream{s}; }
+void Lexer::stream(const std::string &s) { scanner = std::istringstream{s}; }
 
 Token Lexer::number() {
   double d{0};
-  m_scanner.unget();
-  m_scanner >> d;
+  scanner.unget();
+  scanner >> d;
   return Token{Token::Kind::NUMBER, d};
 }
-/*
-Token Lexer::variable(char ch) {
-  std::string s{ch};
-  while (std::isalpha(ch = m_scanner.get())) s += ch;
-  if (m_scanner.good()) m_scanner.unget();  // don't unget when eof
-  return Token{Token::Kind::VARIABLE, s};
-} */
 
 Token Lexer::get(void) {
-  if (m_full) {
-    m_full = false;
-    return m_buffer;
+  if (full) {
+    full = false;
+    return buffer;
   }
 
   for (;;) {
-    char ch = m_scanner.get();
+    char ch = scanner.get();
     switch (ch) {
       case ' ':
         continue;
@@ -59,8 +52,7 @@ Token Lexer::get(void) {
           return number();
         } else if (std::isalpha(ch)) {
           return Token{Token::Kind::VARIABLE, ch};
-          // return variable(ch);
-        } else if (m_scanner.eof()) {
+        } else if (scanner.eof()) {
           return Token{Token::Kind::END};
         } else {
           throw(std::invalid_argument("unknown token"));
@@ -70,18 +62,18 @@ Token Lexer::get(void) {
   }
 }
 
-void Lexer::putback(Token t) {
-  if (m_full) {
+void Lexer::putback(Token token) {
+  if (full) {
     throw(std::invalid_argument("buffer full"));
   }
-  m_buffer = t;
-  m_full = true;
+  buffer = token;
+  full = true;
 }
 
 Token Lexer::peek(void) {
-  if (m_full) {
-    return m_buffer;
+  if (full) {
+    return buffer;
   }
   putback(get());
-  return m_buffer;
+  return buffer;
 }

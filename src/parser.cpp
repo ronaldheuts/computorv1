@@ -68,17 +68,19 @@ UnaryExpr::UnaryExpr(Token::Kind k, std::unique_ptr<node_t>& c)
 
 /* Tree */
 
-void Tree::root(std::unique_ptr<node_t>& r) { m_root = std::move(r); }
+void Tree::setRoot(std::unique_ptr<node_t>& r) { root = std::move(r); }
 
 /* Parser */
 
-Parser::Parser() : m_lexer{} {}
+Parser::Parser() : lexer{} {}
 
-void Parser::stream(const std::string& s) { m_lexer.stream(s); }
+void Parser::stream(const std::string& s) { lexer.stream(s); }
 
-Token Parser::peek(void) { return m_lexer.peek(); }
+Token Parser::peek() { return lexer.peek(); }
 
-Token Parser::advance(void) { return m_lexer.get(); }
+Token Parser::advance() { return lexer.get(); }
+
+void Parser::putback(Token token) { lexer.putback(token); }
 
 bool Parser::check(const Token& token, Token::Kind kind) {
   return token.kind == kind;
@@ -105,12 +107,37 @@ std::unique_ptr<Parser::node_t> Parser::primary(void) {
 }
 
 std::unique_ptr<Parser::node_t> Parser::term(void) {
-  std::unique_ptr<node_t> expr = primary();
+  Term expr{};
 
-  if (check(peek(), Token::Kind::ASTERISK)) {
-    Token::Kind current = peek().kind;
-    advance();
+  if (check(peek().kind, Token::Kind::NUMBER)) {
+    expr.coe = std::get<double>(advance().value);
   }
+
+  if (check(peek().kind, Token::Kind::ASTERISK)) {
+    advance();
+  } else {
+    throw(std::invalid_argument("missing asterisk"));
+  }
+
+  if (check(peek().kind, Token::Kind::VARIABLE)) {
+    expr.var = std::get<char>(advance().value);
+  } else {
+    throw(std::invalid_argument("missing variable"));
+  }
+
+  if (check(peek().kind, Token::Kind::CARET)) {
+    advance();
+  } else {
+    throw(std::invalid_argument("missing caret"));
+  }
+
+  if (check(peek().kind, Token::Kind::NUMBER)) {
+    expr.exp = std::get<double>(advance().value);
+  } else {
+    throw(std::invalid_argument("missing exponent"));
+  }
+
+  return std::make_unique<node_t>(expr);
 }
 
 std::unique_ptr<Parser::node_t> Parser::unary(void) {
@@ -129,7 +156,7 @@ std::unique_ptr<Parser::node_t> Parser::power(void) {
   while (check(peek(), Token::Kind::CARET)) {
     Token::Kind current = peek().kind;
     advance();
-    std::unique_ptr<node_t> rhs = primary();
+    std::unique_ptr<node_t> rhs = term();
     expr = std::make_unique<node_t>(BinaryExpr{current, expr, rhs});
   }
 
@@ -240,34 +267,35 @@ void Parser::parse(void) {
 
   printTerms(rpn.terms);
 
-  auto reduced = reduce(rpn.terms);
+  //   auto reduced = reduce(rpn.terms);
 
-  for (const auto& term : reduced) {
-    if (term.second.coe < 0) {
-      std::cout << "- " << -term.second.coe;
-    } else {
-      std::cout << "+ " << term.second.coe;
+  //   for (const auto& term : reduced) {
+  //     if (term.second.coe < 0) {
+  //       std::cout << "- " << -term.second.coe;
+  //     } else {
+  //       std::cout << "+ " << term.second.coe;
+  //     }
+  //     if (term.second.var) {
+  //       std::cout << " * " << term.second.var;
+  //     }
+  //     if (term.second.exp) {
+  //       std::cout << " ^ " << term.second.exp;
+  //     } else {
+  //       // std::cout << " ^ 0";
+  //     }
+  //     std::cout << " ";
+  //   }
+  //   std::cout << "\n";
+  // }
+  std::cout << "reduced:\n";
+  for (auto& x : rpn.reduced) {
+    std::cout << "[ " << x.second.coe;
+    if (x.second.var) {
+      std::cout << " * " << x.second.var << " ^ " << x.second.exp;
     }
-    if (term.second.var) {
-      std::cout << " * " << term.second.var;
-    }
-    if (term.second.exp) {
-      std::cout << " ^ " << term.second.exp;
-    } else {
-      // std::cout << " ^ 0";
-    }
-    std::cout << " ";
+    std::cout << " ]\n";
   }
-  std::cout << "\n";
 }
-
-// for (auto& x : rpn.reduced) {
-//   std::cout << "[ " << x.second.coe;
-//   if (x.second.var) {
-//     std::cout << " * " << x.second.var << " ^ " << x.second.exp;
-//   }
-//   std::cout << " ]\n";
-// }
 
 /*   if (!solvable(rpn.terms)) {
     throw(std::runtime_error(

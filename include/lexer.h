@@ -42,7 +42,7 @@ class Lexer {
   Token number(void);
   Token variable(char ch);
 
-  std::istringstream m_scanner;
-  Token m_buffer;
-  bool m_full;
+  std::istringstream scanner;
+  Token buffer;
+  bool full;
 };

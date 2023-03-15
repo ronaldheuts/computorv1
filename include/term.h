@@ -17,7 +17,11 @@ struct Term {
   Term &operator=(const Term &a);
   Term &operator-=(const Term &a);
   Term &operator+=(const Term &a);
+
+  Term operator-() const;
 };
+
+std::ostream &operator<<(std::ostream &os, const Term &a);
 
 bool likeTerms(const Term &a, const Term &b);
 bool unlikeTerms(const Term &a, const Term &b);
@@ -29,3 +33,5 @@ Term operator+(const Term &a, const Term &b);
 Term operator-(const Term &a, const Term &b);
 
 bool operator<(const Term &a, const Term &b);
+bool operator==(const Term &a, const Term &b);
+bool operator!=(const Term &a, const Term &b);
