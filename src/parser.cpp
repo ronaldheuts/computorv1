@@ -12,11 +12,12 @@ about their mistakes.
 */
 
 // clang-format off
-/*
 
+/*
 https://gist.github.com/wolfsage/3996187
 https://rosettacode.org/wiki/Parsing/RPN_calculator_algorithm#C++
 https://mdkrajnak.github.io/ebnftest/
+
 
 <equation> ::= <expression> "=" <expression> | <expression>
 <expression> ::= <expression> "-" <factor> | <expression> "+" <factor> | <factor>
@@ -29,32 +30,8 @@ https://mdkrajnak.github.io/ebnftest/
 <int> ::= <int> <digit> | <digit>
 <var> ::= #'[a-z]'+ | #'[A-Z]'+
 <digit> ::= #'[0-9]'+
-
-==========================
-
-<equation> ::= <expression> "=" <expression> | <expression>
-
-<expression> ::= <expression> "-" <factor> | <expression> "+" <factor> | <factor>
-
-<factor> ::= <factor> "*" <power> | <factor> "/" <power> | <power>
-
-<power> ::= <unary> "^" <int> | <unary>
-
-<unary> ::= "-" <primary> | <primary>
-
-<primary> ::= "(" <expression> ")" | <num> | <var>
-
-<num> ::= <int> | <float>
-
-<float> ::= <int> "." <int> | <int> "."
-
-<int> ::= <int> <digit> | <digit>
-
-<var> ::= #'[a-z]'+ | #'[A-Z]'+
-
-<digit> ::= #'[0-9]'+
-
 */
+
 // clang-format on
 
 /* Nodes */
@@ -113,6 +90,10 @@ std::unique_ptr<Parser::node_t> Parser::term(void) {
     expr.coe = std::get<double>(advance().value);
   }
 
+  if (!expr.coe) {
+    return std::make_unique<node_t>(expr);
+  }
+
   if (check(peek().kind, Token::Kind::ASTERISK)) {
     advance();
   } else {
@@ -159,7 +140,6 @@ std::unique_ptr<Parser::node_t> Parser::power(void) {
     std::unique_ptr<node_t> rhs = term();
     expr = std::make_unique<node_t>(BinaryExpr{current, expr, rhs});
   }
-
   return expr;
 }
 
@@ -196,54 +176,15 @@ std::unique_ptr<Parser::node_t> Parser::equation(void) {
     Token::Kind current = peek().kind;
     advance();
     std::unique_ptr<node_t> rhs = expression();
+    if (!check(peek(), Token::Kind::END)) {          // todo cleanup
+      throw(std::runtime_error("invalid grammar"));  // todo cleanup
+    }                                                // todo cleanup
     return std::make_unique<node_t>(BinaryExpr{current, expr, rhs});
   }
   if (!check(peek(), Token::Kind::END)) {
     throw(std::runtime_error("invalid grammar"));
   }
   return expr;
-}
-
-/* bool solvable(const std::vector<Term>& terms) {
-  constexpr int max_degree = 2;
-
-  for (const auto& x : terms) {
-    if (x.exponent > max_degree) {
-      return false;
-    }
-  }
-  return true;
-} */
-
-/* void reduceTerms(const std::vector<Term>& terms) {
-  std::map<std::pair<std::string, int>, Term> polynomial;
-  for (auto& x : terms) {
-    auto it = polynomial.find(std::make_pair(x.variable, x.exponent));
-    if (it != polynomial.end()) {
-      it->second.coe += x.coe;
-    } else {
-      polynomial.insert(
-          std::make_pair(std::make_pair(x.variable, x.exponent), x));
-    }
-  }
-  for (auto& x : polynomial) {
-    std::cout << x.second.coe << " ";
-    if (!isConstant(x.second))
-      std::cout << "* " << x.second.variable << "^" << x.second.exponent << " ";
-  }
-  std::cout << "= 0\n";
-} */
-
-std::map<std::pair<char, int>, Term> reduce(const std::vector<Term>& terms) {
-  std::map<std::pair<char, int>, Term> reduced;
-  for (const auto& term : terms) {
-    auto [it, success] = reduced.insert(
-        std::make_pair(std::make_pair(term.var, term.exp), term));
-    if (!success) {
-      it->second += term;
-    }
-  }
-  return reduced;
 }
 
 void printTerms(const std::vector<Term>& terms) {
@@ -260,34 +201,14 @@ void printTerms(const std::vector<Term>& terms) {
 void Parser::parse(void) {
   std::unique_ptr<node_t> root = equation();
   std::visit(PrintVisitor{}, *root);
+  std::visit(PostFixPrintVisitor{}, *root);
   std::cout << '\n';
 
   RpnVisitor rpn{};
   std::visit(rpn, *root);
-
   printTerms(rpn.terms);
 
-  //   auto reduced = reduce(rpn.terms);
-
-  //   for (const auto& term : reduced) {
-  //     if (term.second.coe < 0) {
-  //       std::cout << "- " << -term.second.coe;
-  //     } else {
-  //       std::cout << "+ " << term.second.coe;
-  //     }
-  //     if (term.second.var) {
-  //       std::cout << " * " << term.second.var;
-  //     }
-  //     if (term.second.exp) {
-  //       std::cout << " ^ " << term.second.exp;
-  //     } else {
-  //       // std::cout << " ^ 0";
-  //     }
-  //     std::cout << " ";
-  //   }
-  //   std::cout << "\n";
-  // }
-  std::cout << "reduced:\n";
+  std::cout << "reduced (size: " << rpn.reduced.size() << "):\n";
   for (auto& x : rpn.reduced) {
     std::cout << "[ " << x.second.coe;
     if (x.second.var) {
@@ -296,12 +217,6 @@ void Parser::parse(void) {
     std::cout << " ]\n";
   }
 }
-
-/*   if (!solvable(rpn.terms)) {
-    throw(std::runtime_error(
-        "The polynomial degree is strictly greater than 2, I can't solve."));
-  } */
-// reduceTerms(rpn.terms);
 
 std::string Parser::prompt(void) {
   std::string equation;

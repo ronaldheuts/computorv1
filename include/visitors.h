@@ -28,16 +28,19 @@ struct PrintVisitor {
   void operator()(const Num &expr);
 };
 
-struct RpnVisitor {
-  using val_t = Token::val_t;
+struct PostFixPrintVisitor {
+  void operator()(const BinaryExpr &expr);
+  void operator()(const UnaryExpr &expr);
+  void operator()(const Term &expr);
+  void operator()(const Var &expr);
+  void operator()(const Num &expr);
+};
 
+struct RpnVisitor {
   RpnVisitor();
 
   std::vector<Term> terms;
-  std::map<std::pair<char, int>, std::pair<Token::Kind, Term>> reduced;
-
-  void evaluate(const BinaryExpr &expr);
-  void evaluate(const UnaryExpr &expr);
+  std::map<std::pair<char, int>, Term> reduced;
 
   void operator()(const BinaryExpr &expr);
   void operator()(const UnaryExpr &expr);
