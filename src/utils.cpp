@@ -26,11 +26,10 @@ double exponentiation(double b, int n) {
 /// @param num for number
 /// @return square root of num
 double squareroot(double num) {
-  constexpr int max_iter = 50;
-
   if (num <= 0) {
     throw(std::invalid_argument("can not get the root of 0 or less"));
   }
+  constexpr int max_iter = 100;
   double result = num;
 
   for (int i = 0; i < max_iter; ++i) {
@@ -39,13 +38,21 @@ double squareroot(double num) {
   return result;
 }
 
+double linear_equation_solver(double a, double b) {
+  if (a > 1 || a < -1) {
+    return b / a;
+  } else if ((a > 0 && a < 1) || (a < 0 && a > -1)) {
+    return (1 / a) * b;
+  }
+}
+
 /// @brief get the roots of a quadratic equation
 /// @param a the coefficient of the variable raised to power of 2
 /// @param b the coefficient of the variable raised to power of 1
 /// @param c the constant
 /// @return the roots of the equation
-std::optional<std::vector<double>> quadratic_formula(double a, double b,
-                                                     double c) {
+std::optional<std::vector<double>> quadratic_equation_solver(double a, double b,
+                                                             double c) {
   if (!a) {
     throw(std::invalid_argument("'a' can not be 0"));
   }

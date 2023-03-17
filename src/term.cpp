@@ -50,7 +50,7 @@ Term Term::operator-() const {
 std::ostream& operator<<(std::ostream& os, const Term& a) {
   os << a.coe;
   if (std::isalpha(a.var)) {
-    os << " * " << a.var << " ^ " << a.exp;
+    os << " * " << a.var << "^" << a.exp;
   }
   return os;
 }

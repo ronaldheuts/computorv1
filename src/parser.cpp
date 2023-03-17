@@ -198,23 +198,104 @@ void printTerms(const std::vector<Term>& terms) {
   }
 }
 
+int getDegree(const std::map<std::pair<char, int>, Term>& terms) {
+  if (terms.empty()) {
+    throw(std::invalid_argument("no terms provided"));
+  }
+  int highest{0};
+
+  for (const auto& term : terms) {
+    if (term.second.exp > highest) highest = term.second.exp;
+  }
+  return highest;
+}
+
+/* bool sameVars(const std::map<std::pair<char, int>, Term>& terms) {
+  if (terms.empty()) {
+    throw(std::invalid_argument("no terms provided"));
+  }
+  Term a = terms.rbegin()->second;
+
+  for (auto it = ++terms.rbegin(); it != terms.rend(); ++it) {
+    if (it->second.coe != 0 && it->second.var != 0) }
+} */
+
+bool solvable(const std::map<std::pair<char, int>, Term>& terms) {
+  if (terms.empty()) {
+    throw(std::invalid_argument("no terms provided"));
+  }
+  constexpr int max_degree = 2;
+  constexpr int min_degree = 0;
+
+  int degree = getDegree(terms);
+
+  if (degree > max_degree || min_degree > degree) return false;
+  return true;
+}
+
+void printReducedForm(const std::map<std::pair<char, int>, Term>& terms) {
+  if (terms.empty()) {
+    throw(std::invalid_argument("no terms provided"));
+  }
+  auto it = terms.rbegin();
+
+  if (it->second.coe < 0) {
+    std::cout << "- " << -(it->second.coe) << " * " << it->second.var << "^"
+              << it->second.exp;
+  } else {
+    std::cout << it->second;
+  }
+
+  ++it;
+  while (it != terms.rend()) {
+    if (it->second.coe > 0) {
+      std::cout << " + " << it->second;
+    } else {
+      std::cout << " - " << -(it->second);
+    }
+    ++it;
+  }
+  std::cout << " = 0\n";
+}
+
 void Parser::parse(void) {
+  auto results = utils::quadratic_equation_solver(9.3, 4, 4);
+
+  for (const auto& x : *results) {
+    std::cout << x << '\n';
+  }
+
   std::unique_ptr<node_t> root = equation();
+
+  std::unique_ptr<node_t> rhs = std::move(std::get<BinaryExpr>(*root).right);
+  std::visit(TransposeVisitor{}, *rhs);
+
+  std::get<BinaryExpr>(*root).right = std::move(rhs);
   std::visit(PrintVisitor{}, *root);
-  std::visit(PostFixPrintVisitor{}, *root);
   std::cout << '\n';
 
   RpnVisitor rpn{};
-  std::visit(rpn, *root);
-  printTerms(rpn.terms);
 
+  rpn.evaluate((std::get<BinaryExpr>(*root)), std::visit(rpn, *root));
+
+  printTerms(rpn.terms);
+  printReducedForm(rpn.reduced);
+  std::cout << "degree: " << getDegree(rpn.reduced) << '\n';
   std::cout << "reduced (size: " << rpn.reduced.size() << "):\n";
   for (auto& x : rpn.reduced) {
-    std::cout << "[ " << x.second.coe;
-    if (x.second.var) {
-      std::cout << " * " << x.second.var << " ^ " << x.second.exp;
-    }
-    std::cout << " ]\n";
+    std::cout << "[ " << x.second << " ]\n";
+  }
+
+  std::cout << "solvable: " << std::boolalpha << solvable(rpn.reduced) << '\n';
+
+  int a = rpn.reduced.find(std::make_pair('X', 2))->second.coe;
+  int b = rpn.reduced.find(std::make_pair('X', 1))->second.coe;
+  int c = rpn.reduced.find(std::make_pair('X', 0))->second.coe;
+
+  auto solutions = utils::quadratic_equation_solver(a, b, c);
+
+  for (const auto& x : *solutions) {
+    std::cout << "X = " << x << '\n';
   }
 }
 

@@ -32,30 +32,24 @@ void PrintVisitor::operator()(const Term& expr) {
   std::cout << std::string(height, ' ') << expr << '\n';
 }
 
-/* PostFixPrintVisitor */
+/* TransposeVisitor */
 
-void PostFixPrintVisitor::operator()(const BinaryExpr& expr) {
+void TransposeVisitor::operator()(BinaryExpr& expr) {
   std::visit(*this, *expr.left);
   std::visit(*this, *expr.right);
-  std::cout << static_cast<char>(expr.oper) << " ";
 }
 
-void PostFixPrintVisitor::operator()(const UnaryExpr& expr) {
+void TransposeVisitor::operator()(UnaryExpr& expr) {
   std::visit(*this, *expr.child);
-  std::cout << static_cast<char>(expr.oper) << " ";
 }
 
-void PostFixPrintVisitor::operator()(const Term& expr) {
-  std::cout << "[" << expr << "] ";
+void TransposeVisitor::operator()(Term& expr) {
+  expr.coe = expr.coe != 0 ? -(expr.coe) : 0;
 }
 
-void PostFixPrintVisitor::operator()(const Var& expr) {
-  std::cout << expr.value;
-}
+void TransposeVisitor::operator()(Var& expr) {}
 
-void PostFixPrintVisitor::operator()(const Num& expr) {
-  std::cout << expr.value;
-}
+void TransposeVisitor::operator()(Num& expr) {}
 
 /* RpnVisitor */
 
@@ -65,21 +59,39 @@ void PostFixPrintVisitor::operator()(const Num& expr) {
 /// @brief post-order traversal of the abstract syntax tree;
 RpnVisitor::RpnVisitor(void) : terms{}, reduced{} {}
 
-void RpnVisitor::operator()(const BinaryExpr& expr) {
-  std::visit(*this, *(expr.left));
-  std::visit(*this, *(expr.right));
+void RpnVisitor::evaluate(const BinaryExpr& expr, Term term) {
+  if (expr.oper == Token::Kind::MINUS) term = -term;
+  const auto [it, success] =
+      reduced.insert(std::make_pair(std::make_pair(term.var, term.exp), term));
+  if (!success) {
+    it->second += term;
+  }
 }
 
-void RpnVisitor::operator()(const UnaryExpr& expr) {
-  std::visit(*this, *(expr.child));
+Term RpnVisitor::operator()(const BinaryExpr& expr) {
+  Term lhs = std::visit(*this, *(expr.left));
+  Term rhs = std::visit(*this, *(expr.right));
+
+  if (expr.oper == Token::Kind::MINUS) rhs = -rhs;
+  const auto [it, success] =
+      reduced.insert(std::make_pair(std::make_pair(rhs.var, rhs.exp), rhs));
+  if (!success) {
+    it->second += rhs;
+  }
+  return lhs;
 }
 
-void RpnVisitor::operator()(const Term& expr) { terms.emplace_back(expr); }
-
-void RpnVisitor::operator()(const Num& expr) {
-  terms.emplace_back(Term{expr.value});
+Term RpnVisitor::operator()(const UnaryExpr& expr) {
+  switch (expr.oper) {
+    case Token::Kind::MINUS:
+      return -(std::visit(*this, *(expr.child)));
+    case Token::Kind::PLUS:  // maybe remove
+      return std::visit(*this, *(expr.child));
+  }
 }
 
-void RpnVisitor::operator()(const Var& expr) {
-  terms.emplace_back(Term{1, expr.value});
-}
+Term RpnVisitor::operator()(const Term& expr) { return expr; }
+
+Term RpnVisitor::operator()(const Num& expr) { return Term{expr.value}; }
+
+Term RpnVisitor::operator()(const Var& expr) { return Term{1, expr.value}; }

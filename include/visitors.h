@@ -28,12 +28,12 @@ struct PrintVisitor {
   void operator()(const Num &expr);
 };
 
-struct PostFixPrintVisitor {
-  void operator()(const BinaryExpr &expr);
-  void operator()(const UnaryExpr &expr);
-  void operator()(const Term &expr);
-  void operator()(const Var &expr);
-  void operator()(const Num &expr);
+struct TransposeVisitor {
+  void operator()(BinaryExpr &expr);
+  void operator()(UnaryExpr &expr);
+  void operator()(Term &expr);
+  void operator()(Var &expr);
+  void operator()(Num &expr);
 };
 
 struct RpnVisitor {
@@ -42,9 +42,11 @@ struct RpnVisitor {
   std::vector<Term> terms;
   std::map<std::pair<char, int>, Term> reduced;
 
-  void operator()(const BinaryExpr &expr);
-  void operator()(const UnaryExpr &expr);
-  void operator()(const Term &expr);
-  void operator()(const Var &expr);
-  void operator()(const Num &expr);
+  void evaluate(const BinaryExpr &expr, Term term);
+
+  Term operator()(const BinaryExpr &expr);
+  Term operator()(const UnaryExpr &expr);
+  Term operator()(const Term &expr);
+  Term operator()(const Var &expr);
+  Term operator()(const Num &expr);
 };

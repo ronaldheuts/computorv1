@@ -25,15 +25,6 @@ int main(int argc, char *argv[]) try {
   }
   par.parse();
 
-  // auto res = utils::quadratic_formula(1, 0, 8);
-  // if ((*res).empty()) {
-  //   std::cout << "negative discriminant is not supported";
-  // }
-  // for (const auto &x : *res) {
-  //   std::cout << x << " ";
-  // }
-  // std::cout << '\n';
-
   return 0;
 } catch (std::exception &e) {
   std::cerr << e.what();

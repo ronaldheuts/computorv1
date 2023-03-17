@@ -81,21 +81,30 @@ TEST(squareroot, bigNonPerfectSquare) {
 
 /* quadratic formula */
 
-TEST(quadratic_formula, zeroZeroZero) {
-  EXPECT_THROW(utils::quadratic_formula(0, 0, 0), std::invalid_argument);
+TEST(quadratic_equation_solver, zeroZeroZero) {
+  EXPECT_THROW(utils::quadratic_equation_solver(0, 0, 0),
+               std::invalid_argument);
 }
 
 // discriminant is 0
-TEST(quadratic_formula, oneZeroZero) {
-  auto result = utils::quadratic_formula(1, 0, 0);
+TEST(quadratic_equation_solver, oneZeroZero) {
+  auto result = utils::quadratic_equation_solver(1, 0, 0);
   EXPECT_TRUE(result->size() == 1);
   EXPECT_EQ(result->at(0), 0);
 }
 
 // discriminant is positive
-TEST(quadratic_formula, oneOneZero) {
-  auto result = utils::quadratic_formula(1, 1, 0);
+TEST(quadratic_equation_solver, oneOneZero) {
+  auto result = utils::quadratic_equation_solver(1, 1, 0);
   EXPECT_TRUE(result->size() == 2);
   EXPECT_EQ(result->at(0), 0);
   EXPECT_EQ(result->at(1), -1);
 }
+
+// from subject: 4 * X^0 + 4 * X^1 - 9.3 * X^2 = 0
+// TEST(quadratic_equation_solver, oneOneZero) {
+//   auto result = utils::quadratic_equation_solver(9.3, 4, 4);
+//   EXPECT_TRUE(result->size() == 2);
+//   EXPECT_EQ(result->at(0), 0);
+//   EXPECT_EQ(result->at(1), -1);
+// }
