@@ -34,19 +34,6 @@ https://mdkrajnak.github.io/ebnftest/
 
 // clang-format on
 
-/* Nodes */
-
-BinaryExpr::BinaryExpr(Token::Kind k, std::unique_ptr<node_t>& l,
-                       std::unique_ptr<node_t>& r)
-    : oper{k}, left{std::move(l)}, right{std::move(r)} {}
-
-UnaryExpr::UnaryExpr(Token::Kind k, std::unique_ptr<node_t>& c)
-    : oper{k}, child{std::move(c)} {}
-
-/* Tree */
-
-void Tree::setRoot(std::unique_ptr<node_t>& r) { root = std::move(r); }
-
 /* Parser */
 
 Parser::Parser() : lexer{} {}
@@ -73,9 +60,9 @@ bool Parser::match(const Token& token, Token::Kind kind) {
 
 std::unique_ptr<Parser::node_t> Parser::primary(void) {
   switch (peek().kind) {
-    case Token::Kind::NUMBER:
+    case Token::Kind::kNumber:
       return std::make_unique<node_t>(Num{std::get<double>(advance().value)});
-    case Token::Kind::VARIABLE: {
+    case Token::Kind::kVariable: {
       return std::make_unique<node_t>(Var{std::get<char>(advance().value)});
     }
     default:
@@ -86,7 +73,7 @@ std::unique_ptr<Parser::node_t> Parser::primary(void) {
 std::unique_ptr<Parser::node_t> Parser::term(void) {
   Term expr{};
 
-  if (check(peek().kind, Token::Kind::NUMBER)) {
+  if (check(peek().kind, Token::Kind::kNumber)) {
     expr.coe = std::get<double>(advance().value);
   }
 
@@ -94,25 +81,25 @@ std::unique_ptr<Parser::node_t> Parser::term(void) {
     return std::make_unique<node_t>(expr);
   }
 
-  if (check(peek().kind, Token::Kind::ASTERISK)) {
+  if (check(peek().kind, Token::Kind::kAsterisk)) {
     advance();
   } else {
     throw(std::invalid_argument("missing asterisk"));
   }
 
-  if (check(peek().kind, Token::Kind::VARIABLE)) {
+  if (check(peek().kind, Token::Kind::kVariable)) {
     expr.var = std::get<char>(advance().value);
   } else {
     throw(std::invalid_argument("missing variable"));
   }
 
-  if (check(peek().kind, Token::Kind::CARET)) {
+  if (check(peek().kind, Token::Kind::kCaret)) {
     advance();
   } else {
     throw(std::invalid_argument("missing caret"));
   }
 
-  if (check(peek().kind, Token::Kind::NUMBER)) {
+  if (check(peek().kind, Token::Kind::kNumber)) {
     expr.exp = std::get<double>(advance().value);
   } else {
     throw(std::invalid_argument("missing exponent"));
@@ -122,7 +109,7 @@ std::unique_ptr<Parser::node_t> Parser::term(void) {
 }
 
 std::unique_ptr<Parser::node_t> Parser::unary(void) {
-  if (check(peek(), Token::Kind::MINUS)) {
+  if (check(peek(), Token::Kind::kMinus)) {
     Token::Kind current = peek().kind;
     advance();
     std::unique_ptr<node_t> expr = unary();
@@ -134,7 +121,7 @@ std::unique_ptr<Parser::node_t> Parser::unary(void) {
 std::unique_ptr<Parser::node_t> Parser::power(void) {
   std::unique_ptr<node_t> expr = unary();
 
-  while (check(peek(), Token::Kind::CARET)) {
+  while (check(peek(), Token::Kind::kCaret)) {
     Token::Kind current = peek().kind;
     advance();
     std::unique_ptr<node_t> rhs = term();
@@ -146,8 +133,8 @@ std::unique_ptr<Parser::node_t> Parser::power(void) {
 std::unique_ptr<Parser::node_t> Parser::factor(void) {
   std::unique_ptr<node_t> expr = power();
 
-  while (check(peek(), Token::Kind::ASTERISK) ||
-         check(peek(), Token::Kind::SLASH)) {
+  while (check(peek(), Token::Kind::kAsterisk) ||
+         check(peek(), Token::Kind::kSlash)) {
     Token::Kind current = peek().kind;
     advance();
     std::unique_ptr<node_t> rhs = power();
@@ -159,8 +146,8 @@ std::unique_ptr<Parser::node_t> Parser::factor(void) {
 std::unique_ptr<Parser::node_t> Parser::expression(void) {
   std::unique_ptr<node_t> expr = factor();
 
-  while (check(peek(), Token::Kind::PLUS) ||
-         check(peek(), Token::Kind::MINUS)) {
+  while (check(peek(), Token::Kind::kPlus) ||
+         check(peek(), Token::Kind::kMinus)) {
     Token::Kind current = peek().kind;
     advance();
     std::unique_ptr<node_t> rhs = factor();
@@ -172,135 +159,27 @@ std::unique_ptr<Parser::node_t> Parser::expression(void) {
 std::unique_ptr<Parser::node_t> Parser::equation(void) {
   std::unique_ptr<node_t> expr = expression();
 
-  if (check(peek(), Token::Kind::EQUAL)) {
+  if (check(peek(), Token::Kind::kEqual)) {
     Token::Kind current = peek().kind;
     advance();
     std::unique_ptr<node_t> rhs = expression();
-    if (!check(peek(), Token::Kind::END)) {          // todo cleanup
+    if (!check(peek(), Token::Kind::kEnd)) {         // todo cleanup
       throw(std::runtime_error("invalid grammar"));  // todo cleanup
     }                                                // todo cleanup
     return std::make_unique<node_t>(BinaryExpr{current, expr, rhs});
   }
-  if (!check(peek(), Token::Kind::END)) {
+  if (!check(peek(), Token::Kind::kEnd)) {
     throw(std::runtime_error("invalid grammar"));
   }
   return expr;
 }
 
-void printTerms(const std::vector<Term>& terms) {
-  std::cout << "number of terms: " << terms.size() << "\n";
-  for (auto& x : terms) {
-    std::cout << "[ " << x.coe;
-    if (x.var) {
-      std::cout << " * " << x.var << " ^ " << x.exp;
-    }
-    std::cout << " ]\n";
-  }
-}
+void Parser::parse(void) { tree.setRoot(equation()); }
 
-int getDegree(const std::map<std::pair<char, int>, Term>& terms) {
-  if (terms.empty()) {
-    throw(std::invalid_argument("no terms provided"));
-  }
-  int highest{0};
-
-  for (const auto& term : terms) {
-    if (term.second.exp > highest) highest = term.second.exp;
-  }
-  return highest;
-}
-
-/* bool sameVars(const std::map<std::pair<char, int>, Term>& terms) {
-  if (terms.empty()) {
-    throw(std::invalid_argument("no terms provided"));
-  }
-  Term a = terms.rbegin()->second;
-
-  for (auto it = ++terms.rbegin(); it != terms.rend(); ++it) {
-    if (it->second.coe != 0 && it->second.var != 0) }
-} */
-
-bool solvable(const std::map<std::pair<char, int>, Term>& terms) {
-  if (terms.empty()) {
-    throw(std::invalid_argument("no terms provided"));
-  }
-  constexpr int max_degree = 2;
-  constexpr int min_degree = 0;
-
-  int degree = getDegree(terms);
-
-  if (degree > max_degree || min_degree > degree) return false;
-  return true;
-}
-
-void printReducedForm(const std::map<std::pair<char, int>, Term>& terms) {
-  if (terms.empty()) {
-    throw(std::invalid_argument("no terms provided"));
-  }
-  auto it = terms.rbegin();
-
-  if (it->second.coe < 0) {
-    std::cout << "- " << -(it->second.coe) << " * " << it->second.var << "^"
-              << it->second.exp;
-  } else {
-    std::cout << it->second;
-  }
-
-  ++it;
-  while (it != terms.rend()) {
-    if (it->second.coe > 0) {
-      std::cout << " + " << it->second;
-    } else {
-      std::cout << " - " << -(it->second);
-    }
-    ++it;
-  }
-  std::cout << " = 0\n";
-}
-
-void Parser::parse(void) {
-  auto results = utils::quadratic_equation_solver(9.3, 4, 4);
-
-  for (const auto& x : *results) {
-    std::cout << x << '\n';
-  }
-
-  std::unique_ptr<node_t> root = equation();
-
-  std::unique_ptr<node_t> rhs = std::move(std::get<BinaryExpr>(*root).right);
-  std::visit(TransposeVisitor{}, *rhs);
-
-  std::get<BinaryExpr>(*root).right = std::move(rhs);
-  std::visit(PrintVisitor{}, *root);
-  std::cout << '\n';
-
-  RpnVisitor rpn{};
-
-  rpn.evaluate((std::get<BinaryExpr>(*root)), std::visit(rpn, *root));
-
-  printTerms(rpn.terms);
-  printReducedForm(rpn.reduced);
-  std::cout << "degree: " << getDegree(rpn.reduced) << '\n';
-  std::cout << "reduced (size: " << rpn.reduced.size() << "):\n";
-  for (auto& x : rpn.reduced) {
-    std::cout << "[ " << x.second << " ]\n";
-  }
-
-  std::cout << "solvable: " << std::boolalpha << solvable(rpn.reduced) << '\n';
-
-  int a = rpn.reduced.find(std::make_pair('X', 2))->second.coe;
-  int b = rpn.reduced.find(std::make_pair('X', 1))->second.coe;
-  int c = rpn.reduced.find(std::make_pair('X', 0))->second.coe;
-
-  auto solutions = utils::quadratic_equation_solver(a, b, c);
-
-  for (const auto& x : *solutions) {
-    std::cout << "X = " << x << '\n';
-  }
-}
+Tree& Parser::getTree() { return tree; }
 
 std::string Parser::prompt(void) {
-  std::string equation;
+  std::string                equation;
   constexpr std::string_view msg{
       "Enter a quadratic equation (a * X^2 + b * X^1 + c * X^0 = 0): "};
 

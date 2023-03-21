@@ -33,16 +33,15 @@ class Lexer {
 
   Token get(void);
   Token peek(void);
-  void putback(Token);
-  void stream(const std::string &);
+  void  putback(Token);
+  void  stream(const std::string &);
 
  private:
   Lexer(const Lexer &);
 
   Token number(void);
-  Token variable(char ch);
 
   std::istringstream scanner;
-  Token buffer;
-  bool full;
+  Token              buffer;
+  bool               full;
 };

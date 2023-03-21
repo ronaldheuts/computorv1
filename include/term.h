@@ -11,27 +11,32 @@ struct Term {
   Term(const double c, const char v, const int e);
 
   double coe;
-  char var;
-  int exp;
+  char   var;
+  int    exp;
 
-  Term &operator=(const Term &a);
-  Term &operator-=(const Term &a);
-  Term &operator+=(const Term &a);
+  Term &operator=(const Term &rhs);
+  Term &operator-=(const Term &rhs);
+  Term &operator+=(const Term &rhs);
 
   Term operator-() const;
 };
 
-std::ostream &operator<<(std::ostream &os, const Term &a);
+std::ostream &operator<<(std::ostream &os, const Term &lhs);
 
-bool likeTerms(const Term &a, const Term &b);
-bool unlikeTerms(const Term &a, const Term &b);
-bool isConstant(const Term &a);
+bool likeTerms(const Term &lhs, const Term &rhs);
+bool unlikeTerms(const Term &lhs, const Term &rhs);
+bool likeVars(const Term &lhs, const Term &rhs);
+bool isConstant(const Term &lhs);
 
-Term operator*(const Term &a, const Term &b);
-Term operator/(const Term &a, const Term &b);
-Term operator+(const Term &a, const Term &b);
-Term operator-(const Term &a, const Term &b);
+Term operator*(const Term &lhs, const Term &rhs);
+Term operator/(const Term &lhs, const Term &rhs);
+Term operator+(const Term &lhs, const Term &rhs);
+Term operator-(const Term &lhs, const Term &rhs);
 
-bool operator<(const Term &a, const Term &b);
-bool operator==(const Term &a, const Term &b);
-bool operator!=(const Term &a, const Term &b);
+bool operator<(const Term &lhs, const Term &rhs);
+bool operator==(const Term &lhs, const Term &rhs);
+bool operator!=(const Term &lhs, const Term &rhs);
+
+bool operator<(const Term &lhs, const double &rhs);
+bool operator>(const Term &lhs, const double &rhs);
+bool operator!(const Term &lhs);

@@ -24,7 +24,7 @@ Token Lexer::number() {
   double d{0};
   scanner.unget();
   scanner >> d;
-  return Token{Token::Kind::NUMBER, d};
+  return Token{Token::Kind::kNumber, d};
 }
 
 Token Lexer::get(void) {
@@ -51,9 +51,9 @@ Token Lexer::get(void) {
         if (std::isdigit(ch)) {
           return number();
         } else if (std::isalpha(ch)) {
-          return Token{Token::Kind::VARIABLE, ch};
+          return Token{Token::Kind::kVariable, ch};
         } else if (scanner.eof()) {
-          return Token{Token::Kind::END};
+          return Token{Token::Kind::kEnd};
         } else {
           throw(std::invalid_argument("unknown token"));
         }

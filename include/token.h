@@ -1,11 +1,8 @@
 #pragma once
 
-#include <cstdint>
-#include <iostream>
-#include <map>
-#include <string>
 #include <variant>
 
+// #include <iostream>
 // std::istream& operator>>(std::istream& is, Term& t) {
 //   is >> t.coe >> t.variable >> t.exponent;
 //   return is;
@@ -15,17 +12,17 @@ struct Token {
   using val_t = std::variant<std::monostate, double, char>;
 
   enum class Kind : char {
-    END = 0,
-    NUMBER,
-    VARIABLE,
-    PLUS = '+',
-    MINUS = '-',
-    ASTERISK = '*',
-    SLASH = '/',
-    CARET = '^',
-    LPAREN = '(',
-    RPAREN = ')',
-    EQUAL = '=',
+    kEnd = 0,
+    kNumber,
+    kVariable,
+    kPlus = '+',
+    kMinus = '-',
+    kAsterisk = '*',
+    kSlash = '/',
+    kCaret = '^',
+    kLeftParen = '(',
+    kRightParen = ')',
+    kEqual = '=',
   };
 
   Token();
@@ -33,5 +30,5 @@ struct Token {
   Token(Kind k, val_t v);
 
   val_t value;
-  Kind kind;
+  Kind  kind;
 };

@@ -2,6 +2,7 @@
 #include <iomanip>
 #include <iostream>
 
+#include "interpreter.h"
 #include "parser.h"
 
 /*
@@ -24,6 +25,11 @@ int main(int argc, char *argv[]) try {
     throw(std::invalid_argument("usage: ./computorv1 [equation]"));
   }
   par.parse();
+
+  // unneccesary copy of tree?
+  Interpreter interp(par.getTree());
+
+  interp.evaluate();
 
   return 0;
 } catch (std::exception &e) {

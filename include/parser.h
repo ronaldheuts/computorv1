@@ -9,81 +9,34 @@
 
 #include "lexer.h"
 #include "term.h"
+#include "tree.h"
 #include "visitors.h"
-
-/* Nodes */
-
-struct UnaryExpr;  // forward declaration
-struct Var;        // forward declaration
-struct Num;        // forward declaration
-struct Term;
-
-struct BinaryExpr {
-  using node_t = std::variant<BinaryExpr, UnaryExpr, Var, Num, Term>;
-
-  BinaryExpr(Token::Kind, std::unique_ptr<node_t> &, std::unique_ptr<node_t> &);
-
-  Token::Kind oper;
-  std::unique_ptr<node_t> left;
-  std::unique_ptr<node_t> right;
-};
-
-struct UnaryExpr {
-  using node_t = std::variant<BinaryExpr, UnaryExpr, Var, Num, Term>;
-
-  UnaryExpr(Token::Kind, std::unique_ptr<node_t> &);
-
-  Token::Kind oper;
-  std::unique_ptr<node_t> child;
-};
-
-struct Var {
-  char value;
-};
-
-struct Num {
-  double value;
-};
-
-/* Tree */
-
-class Tree {
-  using node_t = std::variant<BinaryExpr, UnaryExpr, Var, Num, Term>;
-
- public:
-  Tree(void) : root{} {}
-
-  void setRoot(std::unique_ptr<node_t> &);
-
- private:
-  Tree(const Tree &);
-  Tree &operator=(const Tree &);
-
-  std::unique_ptr<node_t> root;
-};
 
 /* Parser */
 
 class Parser {
-  using node_t = std::variant<BinaryExpr, UnaryExpr, Var, Num, Term>;
-
  public:
+  using node_t = std::variant<BinaryExpr, UnaryExpr, Var, Num, Term>;
   Parser();
 
-  void parse();
-  void stream(const std::string &s);
-  std::string prompt();
+  void                      parse();
+  void                      stream(const std::string &s);
+  [[nodiscard]] Tree       &getTree();
+  [[nodiscard]] std::string prompt();
 
  private:
-  Parser(const Parser &);
-  Parser &operator=(const Parser &);
+  Lexer lexer;
+  Tree  tree;
 
-  [[nodiscard]] bool match(const Token &token, Token::Kind kind);
-  [[nodiscard]] bool check(const Token &token, Token::Kind kind);
-  [[nodiscard]] Token peek();
+  Parser(const Parser &) = delete;
+  Parser &operator=(const Parser &) = delete;
+
   Token advance();
-  void putback(Token);
+  void  putback(Token);
 
+  [[nodiscard]] bool  match(const Token &token, Token::Kind kind);
+  [[nodiscard]] bool  check(const Token &token, Token::Kind kind);
+  [[nodiscard]] Token peek();
   [[nodiscard]] std::unique_ptr<node_t> primary();
   [[nodiscard]] std::unique_ptr<node_t> term();
   [[nodiscard]] std::unique_ptr<node_t> unary();
@@ -91,7 +44,4 @@ class Parser {
   [[nodiscard]] std::unique_ptr<node_t> power();
   [[nodiscard]] std::unique_ptr<node_t> expression();
   [[nodiscard]] std::unique_ptr<node_t> equation();
-
-  Lexer lexer;
-  Tree tree;
 };

@@ -6,8 +6,10 @@ add_executable(computorv1_tests utils_tests.cpp)
 
 target_sources(computorv1_tests PUBLIC
   ../src/lexer.cpp
+  ../src/interpreter.cpp
   ../src/parser.cpp
   ../src/token.cpp
+  ../src/tree.cpp
   ../src/term.cpp
   ../src/visitors.cpp
   ../src/utils.cpp)

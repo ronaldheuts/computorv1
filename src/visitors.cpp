@@ -53,18 +53,20 @@ void TransposeVisitor::operator()(Num& expr) {}
 
 /* RpnVisitor */
 
-// when possible, add or subtract terms
-// when not possible, keep a record of operators
-
 /// @brief post-order traversal of the abstract syntax tree;
-RpnVisitor::RpnVisitor(void) : terms{}, reduced{} {}
+RpnVisitor::RpnVisitor(void) : terms{} {}
 
 void RpnVisitor::evaluate(const BinaryExpr& expr, Term term) {
-  if (expr.oper == Token::Kind::MINUS) term = -term;
+  if (expr.oper == Token::Kind::kMinus) {
+    term = -term;
+  }
   const auto [it, success] =
-      reduced.insert(std::make_pair(std::make_pair(term.var, term.exp), term));
+      terms.insert(std::make_pair(std::make_pair(term.var, term.exp), term));
   if (!success) {
     it->second += term;
+  }
+  if (!it->second) {
+    terms.erase(it);
   }
 }
 
@@ -72,20 +74,25 @@ Term RpnVisitor::operator()(const BinaryExpr& expr) {
   Term lhs = std::visit(*this, *(expr.left));
   Term rhs = std::visit(*this, *(expr.right));
 
-  if (expr.oper == Token::Kind::MINUS) rhs = -rhs;
+  if (expr.oper == Token::Kind::kMinus) {
+    rhs = -rhs;
+  }
   const auto [it, success] =
-      reduced.insert(std::make_pair(std::make_pair(rhs.var, rhs.exp), rhs));
+      terms.insert(std::make_pair(std::make_pair(rhs.var, rhs.exp), rhs));
   if (!success) {
     it->second += rhs;
+  }
+  if (!it->second) {
+    terms.erase(it);
   }
   return lhs;
 }
 
 Term RpnVisitor::operator()(const UnaryExpr& expr) {
   switch (expr.oper) {
-    case Token::Kind::MINUS:
+    case Token::Kind::kMinus:
       return -(std::visit(*this, *(expr.child)));
-    case Token::Kind::PLUS:  // maybe remove
+    case Token::Kind::kPlus:  // maybe remove
       return std::visit(*this, *(expr.child));
   }
 }

@@ -1,17 +1,21 @@
 #include "term.h"
 
-/* Term helper functions */
+/* Helper functions */
 
 /// @brief check if two terms (e.g. X^2) share the same variables and exponents
-bool likeTerms(const Term& a, const Term& b) {
-  return a.var == b.var && a.exp == b.exp;
+bool likeTerms(const Term& lhs, const Term& rhs) {
+  return lhs.var == rhs.var && lhs.exp == rhs.exp;
 }
 
-bool unlikeTerms(const Term& a, const Term& b) { return !(likeTerms(a, b)); }
+bool unlikeTerms(const Term& lhs, const Term& rhs) {
+  return !(likeTerms(lhs, rhs));
+}
 
-bool isConstant(const Term& a) { return !a.var; }
+bool likeVars(const Term& lhs, const Term& rhs) { return lhs.var == rhs.var; }
 
-bool sameVars(const Term& a, const Term& b) { return a.var == b.var; }
+bool isConstant(const Term& lhs) { return !lhs.var; }
+
+bool sameVars(const Term& lhs, const Term& rhs) { return lhs.var == rhs.var; }
 
 /* Term */
 
@@ -24,20 +28,20 @@ Term::Term(const double c, const char v) : coe{c}, var{v}, exp{0} {}
 Term::Term(const double c, const char v, const int e)
     : coe{c}, var{v}, exp{e} {}
 
-Term& Term::operator=(const Term& a) {
-  coe = a.coe;
-  var = a.var;
-  exp = a.exp;
+Term& Term::operator=(const Term& rhs) {
+  coe = rhs.coe;
+  var = rhs.var;
+  exp = rhs.exp;
   return *this;
 }
 
-Term& Term::operator-=(const Term& a) {
-  *this - a;
+Term& Term::operator-=(const Term& rhs) {
+  *this - rhs;
   return *this;
 }
 
-Term& Term::operator+=(const Term& a) {
-  coe += a.coe;
+Term& Term::operator+=(const Term& rhs) {
+  coe += rhs.coe;
   return *this;
 }
 
@@ -47,54 +51,62 @@ Term Term::operator-() const {
   return term;
 }
 
-std::ostream& operator<<(std::ostream& os, const Term& a) {
-  os << a.coe;
-  if (std::isalpha(a.var)) {
-    os << " * " << a.var << "^" << a.exp;
+std::ostream& operator<<(std::ostream& os, const Term& lhs) {
+  os << lhs.coe;
+  if (std::isalpha(lhs.var)) {
+    os << " * " << lhs.var << "^" << lhs.exp;
   }
   return os;
 }
 
-Term operator+(const Term& a, const Term& b) {
-  if (likeTerms(a, b)) {
-    return Term{a.coe + b.coe, a.var, a.exp};
+Term operator+(const Term& lhs, const Term& rhs) {
+  if (likeTerms(lhs, rhs)) {
+    return Term{lhs.coe + rhs.coe, lhs.var, lhs.exp};
   }
   throw(std::runtime_error("can not add unlike terms"));
 }
 
-Term operator-(const Term& a, const Term& b) {
-  if (likeTerms(a, b)) {
-    return Term{a.coe - b.coe, a.var, a.exp};
+Term operator-(const Term& lhs, const Term& rhs) {
+  if (likeTerms(lhs, rhs)) {
+    return Term{lhs.coe - rhs.coe, lhs.var, lhs.exp};
   }
   throw(std::runtime_error("can not subtract unlike terms"));
 }
 
-Term operator*(const Term& a, const Term& b) {
-  if (isConstant(a)) {
-    return Term{a.coe * b.coe, b.var, b.exp};
-  } else if (isConstant(b)) {
-    return Term{a.coe * b.coe, a.var, a.exp};
-  } else if (sameVars(a, b)) {
-    return Term{a.coe * b.coe, a.var, a.exp + b.exp};
+Term operator*(const Term& lhs, const Term& rhs) {
+  if (isConstant(lhs)) {
+    return Term{lhs.coe * rhs.coe, rhs.var, rhs.exp};
+  } else if (isConstant(rhs)) {
+    return Term{lhs.coe * rhs.coe, lhs.var, lhs.exp};
+  } else if (sameVars(lhs, rhs)) {
+    return Term{lhs.coe * rhs.coe, lhs.var, lhs.exp + rhs.exp};
   }
   throw(std::runtime_error("can not factor unlike terms"));
 }
 
-Term operator/(const Term& a, const Term& b) {
-  if (isConstant(a)) {
-    return Term{a.coe / b.coe, b.var, b.exp};
-  } else if (isConstant(b)) {
-    return Term{a.coe / b.coe, a.var, a.exp};
-  } else if (sameVars(a, b)) {
-    return Term{a.coe / b.coe, a.var, a.exp + b.exp};
+Term operator/(const Term& lhs, const Term& rhs) {
+  if (isConstant(lhs)) {
+    return Term{lhs.coe / rhs.coe, rhs.var, rhs.exp};
+  } else if (isConstant(rhs)) {
+    return Term{lhs.coe / rhs.coe, lhs.var, lhs.exp};
+  } else if (sameVars(lhs, rhs)) {
+    return Term{lhs.coe / rhs.coe, lhs.var, lhs.exp + rhs.exp};
   }
   throw(std::runtime_error("can not divide unlike terms"));
 }
 
-bool operator<(const Term& a, const Term& b) {
-  return a.var < b.var || a.exp < b.exp;
+bool operator<(const Term& lhs, const Term& rhs) {
+  return lhs.var < rhs.var || lhs.exp < rhs.exp;
 }
 
-bool operator==(const Term& a, const Term& b) {
-  return a.coe == b.coe && a.var == b.var && a.exp == b.exp;
+bool operator==(const Term& lhs, const Term& rhs) {
+  return lhs.coe == rhs.coe && lhs.var == rhs.var && lhs.exp == rhs.exp;
 }
+
+bool operator!=(const Term& lhs, const Term& rhs) { return !(lhs == rhs); }
+
+bool operator<(const Term& lhs, const double& rhs) { return lhs.coe < rhs; }
+
+bool operator>(const Term& lhs, const double& rhs) { return lhs.coe > rhs; }
+
+bool operator!(const Term& lhs) { return !lhs.coe; }

@@ -16,7 +16,7 @@ struct Num;
 struct Term;
 
 struct PrintVisitor {
-  int height;
+  int         height;
   std::string prefix;
 
   PrintVisitor();
@@ -39,8 +39,7 @@ struct TransposeVisitor {
 struct RpnVisitor {
   RpnVisitor();
 
-  std::vector<Term> terms;
-  std::map<std::pair<char, int>, Term> reduced;
+  std::map<std::pair<char, int>, Term> terms;
 
   void evaluate(const BinaryExpr &expr, Term term);
 

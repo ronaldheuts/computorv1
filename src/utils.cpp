@@ -30,7 +30,7 @@ double squareroot(double num) {
     throw(std::invalid_argument("can not get the root of 0 or less"));
   }
   constexpr int max_iter = 100;
-  double result = num;
+  double        result = num;
 
   for (int i = 0; i < max_iter; ++i) {
     result = 0.5 * (result + num / result);
