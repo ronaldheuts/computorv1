@@ -44,7 +44,7 @@ void TransposeVisitor::operator()(UnaryExpr& expr) {
 }
 
 void TransposeVisitor::operator()(Term& expr) {
-  expr.coe = expr.coe != 0 ? -(expr.coe) : 0;
+  expr.setCoe(expr.getCoe() > 0 ? -expr.getCoe() : expr.getCoe());
 }
 
 void TransposeVisitor::operator()(Var& expr) {}
@@ -60,8 +60,8 @@ void RpnVisitor::evaluate(const BinaryExpr& expr, Term term) {
   if (expr.oper == Token::Kind::kMinus) {
     term = -term;
   }
-  const auto [it, success] =
-      terms.insert(std::make_pair(std::make_pair(term.var, term.exp), term));
+  const auto [it, success] = terms.insert(
+      std::make_pair(std::make_pair(term.getVar(), term.getExp()), term));
   if (!success) {
     it->second += term;
   }
@@ -77,8 +77,9 @@ Term RpnVisitor::operator()(const BinaryExpr& expr) {
   if (expr.oper == Token::Kind::kMinus) {
     rhs = -rhs;
   }
-  const auto [it, success] =
-      terms.insert(std::make_pair(std::make_pair(rhs.var, rhs.exp), rhs));
+  const auto [it, success] = terms.insert(
+      std::make_pair(std::make_pair(rhs.getVar(), rhs.getExp()), rhs));
+
   if (!success) {
     it->second += rhs;
   }
@@ -91,7 +92,7 @@ Term RpnVisitor::operator()(const BinaryExpr& expr) {
 Term RpnVisitor::operator()(const UnaryExpr& expr) {
   switch (expr.oper) {
     case Token::Kind::kMinus:
-      return -(std::visit(*this, *(expr.child)));
+      return -std::visit(*this, *(expr.child));
     case Token::Kind::kPlus:  // maybe remove
       return std::visit(*this, *(expr.child));
   }

@@ -74,12 +74,12 @@ std::unique_ptr<Parser::node_t> Parser::term(void) {
   Term expr{};
 
   if (check(peek().kind, Token::Kind::kNumber)) {
-    expr.coe = std::get<double>(advance().value);
+    expr.setCoe(std::get<double>(advance().value));
   }
 
-  if (!expr.coe) {
-    return std::make_unique<node_t>(expr);
-  }
+  // if (!expr.getCoe()) {
+  //   return std::make_unique<node_t>(expr);
+  // }
 
   if (check(peek().kind, Token::Kind::kAsterisk)) {
     advance();
@@ -88,7 +88,7 @@ std::unique_ptr<Parser::node_t> Parser::term(void) {
   }
 
   if (check(peek().kind, Token::Kind::kVariable)) {
-    expr.var = std::get<char>(advance().value);
+    expr.setVar(std::get<char>(advance().value));
   } else {
     throw(std::invalid_argument("missing variable"));
   }
@@ -100,7 +100,7 @@ std::unique_ptr<Parser::node_t> Parser::term(void) {
   }
 
   if (check(peek().kind, Token::Kind::kNumber)) {
-    expr.exp = std::get<double>(advance().value);
+    expr.setExp(std::get<double>(advance().value));
   } else {
     throw(std::invalid_argument("missing exponent"));
   }
