@@ -2,7 +2,7 @@
 
 /* Helper functions */
 
-void printTerms(const std::vector<Term>& terms) {
+inline void printTerms(const std::vector<Term>& terms) {
   std::cout << "number of terms: " << terms.size() << "\n";
   for (auto& x : terms) {
     std::cout << "[ " << x.getCoe();
@@ -13,7 +13,7 @@ void printTerms(const std::vector<Term>& terms) {
   }
 }
 
-int getDegree(const std::map<std::pair<char, int>, Term>& terms) {
+inline int getDegree(const std::map<std::pair<char, int>, Term>& terms) {
   if (terms.empty()) {
     throw(std::invalid_argument("no terms provided"));
   }
@@ -25,7 +25,7 @@ int getDegree(const std::map<std::pair<char, int>, Term>& terms) {
   return highest;
 }
 
-bool sameVars(const std::map<std::pair<char, int>, Term>& terms) {
+inline bool sameVars(const std::map<std::pair<char, int>, Term>& terms) {
   if (terms.empty()) {
     throw(std::invalid_argument("no terms provided"));
   }
@@ -41,7 +41,7 @@ bool sameVars(const std::map<std::pair<char, int>, Term>& terms) {
   return true;
 }
 
-bool validDegree(const std::map<std::pair<char, int>, Term>& terms) {
+inline bool validDegree(const std::map<std::pair<char, int>, Term>& terms) {
   constexpr int max_degree = 2;
   constexpr int min_degree = 0;
 

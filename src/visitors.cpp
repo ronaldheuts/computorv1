@@ -18,14 +18,7 @@ void PrintVisitor::operator()(const UnaryExpr& expr) {
   std::cout << std::string(height, ' ') << static_cast<char>(expr.oper) << '\n';
   height += 2;
   std::visit(*this, *(expr.child));
-}
-
-void PrintVisitor::operator()(const Var& expr) {
-  std::cout << std::string(height, ' ') << expr.value << '\n';
-}
-
-void PrintVisitor::operator()(const Num& expr) {
-  std::cout << std::string(height, ' ') << expr.value << '\n';
+  height -= 2;
 }
 
 void PrintVisitor::operator()(const Term& expr) {
@@ -46,10 +39,6 @@ void TransposeVisitor::operator()(UnaryExpr& expr) {
 void TransposeVisitor::operator()(Term& expr) {
   expr.setCoe(expr.getCoe() > 0 ? -expr.getCoe() : expr.getCoe());
 }
-
-void TransposeVisitor::operator()(Var& expr) {}
-
-void TransposeVisitor::operator()(Num& expr) {}
 
 /* RpnVisitor */
 
@@ -99,7 +88,3 @@ Term RpnVisitor::operator()(const UnaryExpr& expr) {
 }
 
 Term RpnVisitor::operator()(const Term& expr) { return expr; }
-
-Term RpnVisitor::operator()(const Num& expr) { return Term{expr.value}; }
-
-Term RpnVisitor::operator()(const Var& expr) { return Term{1, expr.value}; }

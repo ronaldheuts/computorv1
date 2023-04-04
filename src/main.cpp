@@ -26,11 +26,9 @@ int main(int argc, char *argv[]) try {
   }
   par.parse();
 
-  // unneccesary copy of tree?
   Interpreter interp(par.getTree());
 
   interp.evaluate();
-
   return 0;
 } catch (std::exception &e) {
   std::cerr << e.what();

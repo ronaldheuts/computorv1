@@ -16,7 +16,7 @@
 
 class Parser {
  public:
-  using node_t = std::variant<BinaryExpr, UnaryExpr, Var, Num, Term>;
+  using node_t = std::variant<BinaryExpr, UnaryExpr, Term>;
   Parser();
 
   void                      parse();

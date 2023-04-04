@@ -1,5 +1,6 @@
 #include "parser.h"
 
+#include <iostream>
 /*
 
 A parser really has two jobs:
@@ -58,53 +59,35 @@ bool Parser::match(const Token& token, Token::Kind kind) {
   return false;
 }
 
-std::unique_ptr<Parser::node_t> Parser::primary(void) {
-  switch (peek().kind) {
-    case Token::Kind::kNumber:
-      return std::make_unique<node_t>(Num{std::get<double>(advance().value)});
-    case Token::Kind::kVariable: {
-      return std::make_unique<node_t>(Var{std::get<char>(advance().value)});
-    }
-    default:
-      throw(std::runtime_error("invalid grammar"));
-  }
-}
-
 std::unique_ptr<Parser::node_t> Parser::term(void) {
   Term expr{};
 
   if (check(peek().kind, Token::Kind::kNumber)) {
     expr.setCoe(std::get<double>(advance().value));
   }
-
-  // if (!expr.getCoe()) {
-  //   return std::make_unique<node_t>(expr);
-  // }
-
+  if (!expr.getCoe() && check(peek().kind, Token::Kind::kEnd)) {
+    return std::make_unique<node_t>(expr);
+  }
   if (check(peek().kind, Token::Kind::kAsterisk)) {
     advance();
   } else {
     throw(std::invalid_argument("missing asterisk"));
   }
-
   if (check(peek().kind, Token::Kind::kVariable)) {
     expr.setVar(std::get<char>(advance().value));
   } else {
     throw(std::invalid_argument("missing variable"));
   }
-
   if (check(peek().kind, Token::Kind::kCaret)) {
     advance();
   } else {
     throw(std::invalid_argument("missing caret"));
   }
-
   if (check(peek().kind, Token::Kind::kNumber)) {
     expr.setExp(std::get<double>(advance().value));
   } else {
     throw(std::invalid_argument("missing exponent"));
   }
-
   return std::make_unique<node_t>(expr);
 }
 

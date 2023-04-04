@@ -1,19 +1,18 @@
 #pragma once
 
 #include <memory>
+#include <variant>
 
 #include "term.h"
 #include "token.h"
 
 /* Nodes */
 
-struct UnaryExpr;  // forward declaration
-struct Var;        // forward declaration
-struct Num;        // forward declaration
+struct UnaryExpr;
 struct Term;
 
 struct BinaryExpr {
-  using node_t = std::variant<BinaryExpr, UnaryExpr, Var, Num, Term>;
+  using node_t = std::variant<BinaryExpr, UnaryExpr, Term>;
 
   BinaryExpr(Token::Kind, std::unique_ptr<node_t> &, std::unique_ptr<node_t> &);
 
@@ -23,7 +22,7 @@ struct BinaryExpr {
 };
 
 struct UnaryExpr {
-  using node_t = std::variant<BinaryExpr, UnaryExpr, Var, Num, Term>;
+  using node_t = std::variant<BinaryExpr, UnaryExpr, Term>;
 
   UnaryExpr(Token::Kind, std::unique_ptr<node_t> &);
 
@@ -31,19 +30,11 @@ struct UnaryExpr {
   std::unique_ptr<node_t> child;
 };
 
-struct Var {
-  char value;
-};
-
-struct Num {
-  double value;
-};
-
 /* Tree */
 
 class Tree {
  public:
-  using node_t = std::variant<BinaryExpr, UnaryExpr, Var, Num, Term>;
+  using node_t = std::variant<BinaryExpr, UnaryExpr, Term>;
   Tree(void);
 
   void    setRoot(std::unique_ptr<node_t> expr);

@@ -27,6 +27,8 @@ Token Lexer::number() {
   return Token{Token::Kind::kNumber, d};
 }
 
+// static std::unordered_map<char> token_table = {};
+
 Token Lexer::get(void) {
   if (full) {
     full = false;
