@@ -1,12 +1,5 @@
 #pragma once
 
-#include <algorithm>
-#include <map>
-#include <memory>
-#include <set>
-#include <string_view>
-#include <vector>
-
 #include "lexer.h"
 #include "term.h"
 #include "tree.h"
@@ -16,7 +9,7 @@
 
 class Parser {
  public:
-  using node_t = std::variant<BinaryExpr, UnaryExpr, Term>;
+  using node_t = Tree::node_t;
   Parser();
 
   void                      parse();
@@ -31,13 +24,9 @@ class Parser {
   Parser(const Parser &) = delete;
   Parser &operator=(const Parser &) = delete;
 
-  Token advance();
-  void  putback(Token);
-
-  [[nodiscard]] bool  match(const Token &token, Token::Kind kind);
+  Token               advance();
   [[nodiscard]] bool  check(const Token &token, Token::Kind kind);
   [[nodiscard]] Token peek();
-  [[nodiscard]] std::unique_ptr<node_t> primary();
   [[nodiscard]] std::unique_ptr<node_t> term();
   [[nodiscard]] std::unique_ptr<node_t> unary();
   [[nodiscard]] std::unique_ptr<node_t> factor();

@@ -35,14 +35,14 @@ struct UnaryExpr {
 class Tree {
  public:
   using node_t = std::variant<BinaryExpr, UnaryExpr, Term>;
-  Tree(void);
+
+  Tree();
+  Tree(const Tree &) = delete;
+  Tree &operator=(const Tree &) = delete;
+  Tree &operator=(const Tree &&) = delete;
 
   void    setRoot(std::unique_ptr<node_t> expr);
   node_t &getRoot() const;
 
   std::unique_ptr<node_t> root;
-
- private:
-  Tree(const Tree &);
-  Tree &operator=(const Tree &);
 };

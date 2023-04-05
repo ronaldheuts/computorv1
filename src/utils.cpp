@@ -46,7 +46,7 @@ double squareroot(const double num) {
 /// @return
 double linear_equation_solver(const double slope, const double intercept) {
   if (!slope) {
-    throw std::invalid_argument("no solution when the 'slope' is 0");
+    throw std::invalid_argument("'slope' can not be 0");
   } else if (!intercept) {
     return 0;
   } else if (slope > 1 || slope < -1) {
@@ -60,9 +60,8 @@ double linear_equation_solver(const double slope, const double intercept) {
 /// @param b the coefficient of the variable raised to power of 1
 /// @param c the constant
 /// @return the roots of the equation
-std::optional<std::vector<double>> quadratic_equation_solver(const double a,
-                                                             const double b,
-                                                             const double c) {
+std::vector<double> quadratic_equation_solver(const double a, const double b,
+                                              const double c) {
   if (!a) {
     throw(std::invalid_argument("'a' can not be 0"));
   }

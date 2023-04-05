@@ -2,12 +2,6 @@
 
 #include <variant>
 
-// #include <iostream>
-// std::istream& operator>>(std::istream& is, Term& t) {
-//   is >> t.coe >> t.variable >> t.exponent;
-//   return is;
-// }
-
 struct Token {
   using val_t = std::variant<std::monostate, double, char>;
 

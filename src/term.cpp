@@ -11,10 +11,6 @@ bool unlikeTerms(const Term& lhs, const Term& rhs) {
   return !(likeTerms(lhs, rhs));
 }
 
-bool likeVars(const Term& lhs, const Term& rhs) {
-  return lhs.getVar() == rhs.getVar();
-}
-
 bool isConstant(const Term& lhs) { return !lhs.getVar(); }
 
 bool sameVars(const Term& lhs, const Term& rhs) {

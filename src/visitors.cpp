@@ -1,27 +1,60 @@
 #include "visitors.h"
 
+PrettyPrint::PrettyPrint(int levels)
+    : levels(levels), width(utils::exponentiation(2, levels + 1)), level(1) {}
+
+void PrettyPrint::operator()(const BinaryExpr& expr) {
+  int offset = width / utils::exponentiation(2, level);
+
+  std::cout << std::string(width, ' ') << static_cast<char>(expr.oper) << '\n';
+
+  width -= offset;
+  level += 1;
+  std::visit(*this, *expr.left);
+  width += offset;
+  level -= 1;
+
+  width += offset;
+  level += 1;
+  std::visit(*this, *expr.right);
+  width -= offset;
+  level -= 1;
+  std::cout << '\n';
+}
+
+void PrettyPrint::operator()(const UnaryExpr& expr) {}
+
+void PrettyPrint::operator()(const Term& expr) {
+  int offset = width / utils::exponentiation(2, level);
+
+  width -= offset;
+  std::cout << std::string(width, ' ') << (expr);
+  width += offset;
+}
+
 /* Visitors */
 
-PrintVisitor::PrintVisitor() : height{0}, prefix{} {}
+PrintVisitor::PrintVisitor() : height{0}, prefix{}, levels{0} {}
 
 void PrintVisitor::operator()(const BinaryExpr& expr) {
-  height += 2;
+  height += 1;
   std::visit(*this, *(expr.left));
-  height -= 2;
+  height -= 1;
   std::cout << std::string(height, ' ') << static_cast<char>(expr.oper) << '\n';
-  height += 2;
+  height += 1;
   std::visit(*this, *(expr.right));
-  height -= 2;
+  height -= 1;
 }
 
 void PrintVisitor::operator()(const UnaryExpr& expr) {
   std::cout << std::string(height, ' ') << static_cast<char>(expr.oper) << '\n';
-  height += 2;
+  height += 1;
   std::visit(*this, *(expr.child));
-  height -= 2;
+  height -= 1;
 }
 
 void PrintVisitor::operator()(const Term& expr) {
+  levels = std::max(levels, height);
   std::cout << std::string(height, ' ') << expr << '\n';
 }
 
@@ -37,7 +70,7 @@ void TransposeVisitor::operator()(UnaryExpr& expr) {
 }
 
 void TransposeVisitor::operator()(Term& expr) {
-  expr.setCoe(expr.getCoe() > 0 ? -expr.getCoe() : expr.getCoe());
+  expr.setCoe(expr > 0 ? -expr.getCoe() : expr.getCoe());
 }
 
 /* RpnVisitor */

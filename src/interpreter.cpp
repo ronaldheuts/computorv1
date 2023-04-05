@@ -33,7 +33,7 @@ inline bool sameVars(const std::map<std::pair<char, int>, Term>& terms) {
 
   if (!isConstant(check)) {
     for (const auto& x : terms) {
-      if (!isConstant(x.second) && !likeVars(x.second, check)) {
+      if (!isConstant(x.second) && !sameVars(x.second, check)) {
         return false;
       }
     }
@@ -58,7 +58,7 @@ bool solvable(const std::map<std::pair<char, int>, Term>& terms) {
   }
   if (!validDegree(terms)) {
     throw(std::invalid_argument(
-        "can not solve quadratic equation with a higher degree than 2"));
+        "can not solve quadratic equation with a degree higher than 2"));
   }
   if (!sameVars(terms)) {
     throw(std::invalid_argument(
@@ -97,6 +97,7 @@ bool isEquation(Interpreter::node_t& expr) {
 
 Interpreter::Interpreter(Tree& t) : tree{} { tree.setRoot(std::move(t.root)); }
 
+/// @brief move quantities across the equal sign of the equation
 void Interpreter::transpose() {
   if (!isEquation(tree.getRoot())) {
     throw(std::invalid_argument("not an equation"));
@@ -104,41 +105,42 @@ void Interpreter::transpose() {
   std::visit(TransposeVisitor{}, *std::get<BinaryExpr>(tree.getRoot()).right);
 }
 
+/// @brief attempt to evaluate the equation
 void Interpreter::evaluate() {
-  std::visit(PrintVisitor{}, tree.getRoot());
-
   RpnVisitor rpn{};
-  transpose();
 
+  std::visit(PrettyPrint{5}, tree.getRoot());
+
+  transpose();
   rpn.evaluate((std::get<BinaryExpr>(tree.getRoot())),
                std::visit(rpn, tree.getRoot()));
 
-  std::cout << '\n';
-
+  std::cout << "Reduced form: ";
   printReducedForm(rpn.terms);
-  std::cout << "degree: " << getDegree(rpn.terms) << '\n';
-  std::cout << "terms (size: " << rpn.terms.size() << "):\n";
-  for (const auto& x : rpn.terms) {
-    std::cout << "[ " << x.second << " ]\n";
-  }
 
-  std::cout << "solvable: " << std::boolalpha << solvable(rpn.terms) << '\n';
+  std::cout << "Polynomial degree: " << getDegree(rpn.terms) << '\n';
 
-  char var = rpn.terms.rbegin()->second.getVar();
-
+  char   var = rpn.terms.rbegin()->second.getVar();
   double a = rpn.terms.find(std::make_pair(var, 2))->second.getCoe();
   double b = rpn.terms.find(std::make_pair(var, 1))->second.getCoe();
   double c = rpn.terms.find(std::make_pair(var, 0))->second.getCoe();
 
-  std::optional<std::vector<double>> solutions =
-      utils::quadratic_equation_solver(a, b, c);
+  std::vector<double> solutions;
 
-  if (!solutions) {
-    std::cout << "complex solutions not supported\n";
+  if (!a) {
+    solutions.emplace_back(utils::linear_equation_solver(b, c));
   } else {
-    std::cout << "solutions size: " << solutions->size() << '\n';
-    for (const auto& x : *solutions) {
-      std::cout << x << '\n';
-    }
+    solutions = utils::quadratic_equation_solver(a, b, c);
+  }
+
+  if (solutions.empty()) {
+    throw std::invalid_argument("complex solutions not supported\n");
+  } else if (solutions.size() == 1) {
+    std::cout << "The solution is:\n";
+  } else if (solutions.size() == 2) {
+    std::cout << "The solutions are:\n";
+  }
+  for (const auto& x : solutions) {
+    std::cout << std::fixed << x << '\n';
   }
 }

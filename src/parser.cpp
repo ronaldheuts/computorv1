@@ -1,6 +1,5 @@
 #include "parser.h"
 
-#include <iostream>
 /*
 
 A parser really has two jobs:
@@ -45,25 +44,18 @@ Token Parser::peek() { return lexer.peek(); }
 
 Token Parser::advance() { return lexer.get(); }
 
-void Parser::putback(Token token) { lexer.putback(token); }
-
 bool Parser::check(const Token& token, Token::Kind kind) {
   return token.kind == kind;
 }
 
-bool Parser::match(const Token& token, Token::Kind kind) {
-  if (check(token, kind)) {
-    advance();
-    return true;
-  }
-  return false;
-}
-
+/* "[num] * [char] ^ [num]" OR "0" AND end of equation */
 std::unique_ptr<Parser::node_t> Parser::term(void) {
   Term expr{};
 
   if (check(peek().kind, Token::Kind::kNumber)) {
     expr.setCoe(std::get<double>(advance().value));
+  } else {
+    throw(std::invalid_argument("missing number"));
   }
   if (!expr.getCoe() && check(peek().kind, Token::Kind::kEnd)) {
     return std::make_unique<node_t>(expr);
@@ -146,14 +138,14 @@ std::unique_ptr<Parser::node_t> Parser::equation(void) {
     Token::Kind current = peek().kind;
     advance();
     std::unique_ptr<node_t> rhs = expression();
-    if (!check(peek(), Token::Kind::kEnd)) {         // todo cleanup
-      throw(std::runtime_error("invalid grammar"));  // todo cleanup
-    }                                                // todo cleanup
+    if (!check(peek(), Token::Kind::kEnd)) {
+      throw(std::runtime_error("invalid grammar"));
+    }
     return std::make_unique<node_t>(BinaryExpr{current, expr, rhs});
   }
-  if (!check(peek(), Token::Kind::kEnd)) {
-    throw(std::runtime_error("invalid grammar"));
-  }
+  // if (!check(peek(), Token::Kind::kEnd)) {
+  //   throw(std::runtime_error("invalid grammar"));
+  // }
   return expr;
 }
 
@@ -162,9 +154,9 @@ void Parser::parse(void) { tree.setRoot(equation()); }
 Tree& Parser::getTree() { return tree; }
 
 std::string Parser::prompt(void) {
-  std::string                equation;
   constexpr std::string_view msg{
       "Enter a quadratic equation (a * X^2 + b * X^1 + c * X^0 = 0): "};
+  std::string equation;
 
   /* to do: error handling around cin */
   std::cout << msg;

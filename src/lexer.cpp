@@ -1,17 +1,5 @@
 #include "lexer.h"
 
-/* Scanner */
-
-// Scanner::Scanner() : m_stream{} {}
-
-// Scanner::Scanner(const std::string &s) : m_stream{s} {}
-
-// char Scanner::peek(void) { return m_stream.peek(); }
-
-// char Scanner::get(void) { return m_stream.get(); }
-
-// void Scanner::unget(void) { m_stream.unget(); }
-
 /* Lexer */
 
 Lexer::Lexer() : scanner{}, buffer{}, full{false} {}
@@ -26,8 +14,6 @@ Token Lexer::number() {
   scanner >> d;
   return Token{Token::Kind::kNumber, d};
 }
-
-// static std::unordered_map<char> token_table = {};
 
 Token Lexer::get(void) {
   if (full) {

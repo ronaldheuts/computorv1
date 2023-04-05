@@ -107,22 +107,22 @@ TEST(quadratic_equation_solver, zeroZeroZero) {
 /* discriminant is 0 */
 TEST(quadratic_equation_solver, oneZeroZero) {
   auto result = utils::quadratic_equation_solver(1, 0, 0);
-  EXPECT_EQ(result->size(), 1);
-  EXPECT_EQ(result->at(0), 0);
+  EXPECT_EQ(result.size(), 1);
+  EXPECT_EQ(result.at(0), 0);
 }
 
 /* discriminant is positive */
 TEST(quadratic_equation_solver, doubleSolution) {
   auto result = utils::quadratic_equation_solver(1, 1, 0);
-  EXPECT_EQ(result->size(), 2);
-  EXPECT_EQ(result->at(0), 0);
-  EXPECT_EQ(result->at(1), -1);
+  EXPECT_EQ(result.size(), 2);
+  EXPECT_EQ(result.at(0), 0);
+  EXPECT_EQ(result.at(1), -1);
 }
 
 TEST(quadratic_equation_solver, singleSolution) {
   auto result = utils::quadratic_equation_solver(1, 4, 4);
-  EXPECT_EQ(result->size(), 1);
-  EXPECT_EQ(result->at(0), -2);
+  EXPECT_EQ(result.size(), 1);
+  EXPECT_EQ(result.at(0), -2);
 }
 
 /* complex solution */

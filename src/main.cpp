@@ -1,7 +1,3 @@
-#include <fstream>
-#include <iomanip>
-#include <iostream>
-
 #include "interpreter.h"
 #include "parser.h"
 

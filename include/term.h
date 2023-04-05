@@ -1,7 +1,6 @@
 #pragma once
 
 #include <iostream>
-#include <set>
 #include <stdexcept>
 
 class Term {
@@ -33,7 +32,7 @@ std::ostream &operator<<(std::ostream &os, const Term &lhs);
 
 bool likeTerms(const Term &lhs, const Term &rhs);
 bool unlikeTerms(const Term &lhs, const Term &rhs);
-bool likeVars(const Term &lhs, const Term &rhs);
+bool sameVars(const Term &lhs, const Term &rhs);
 bool isConstant(const Term &lhs);
 
 Term operator*(const Term &lhs, const Term &rhs);
