@@ -33,13 +33,14 @@ struct QueueElem {
 };
 
 struct PrettyPrint {
-  int                   levels;
-  int                   level;
-  int                   width;
-  QueueElem             buffer;
+  int levels;
+  int level;
+  int width;
+  // QueueElem             buffer;
   std::queue<QueueElem> q;
 
   PrettyPrint(int levels);
+  void buildQueue();
 
   void operator()(const BinaryExpr &expr);
   void operator()(const UnaryExpr &expr);

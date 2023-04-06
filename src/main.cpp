@@ -6,6 +6,7 @@
 2. be specific with user errors - where did it go wrong
 */
 
+// "5 * X^0 + 3 * X^1 + 3 * X^2 = 1 * X^0 + 0 * X^1"
 // "5 * X^0 + 4 * X^1 - 9.3 * X^2 = 1 * X^0"
 // "5 * X^0 + 4 * X^1 = 4 * X^0"
 // "8 * X^0 - 6 * X^1 + 0 * X^2 - 5.6 * X^3 = 3 * X^0"

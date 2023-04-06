@@ -1,7 +1,19 @@
 #include "utils.h"
 
 #include <iostream>
+
 namespace utils {
+
+void ComplexVisitor::operator()(const double& num) { std::cout << num << '\n'; }
+
+void ComplexVisitor::operator()(const Complex& num) {
+  std::cout << num << '\n';
+}
+
+std::ostream& operator<<(std::ostream& os, const Complex& num) {
+  os << num.real << (num.imag > 0 ? " + " : " - ") << absval(num.imag) << "i";
+  return os;
+}
 
 double absval(const double val) { return val < 0 ? -val : val; }
 
@@ -10,6 +22,8 @@ double absval(const double val) { return val < 0 ? -val : val; }
 /// @param n for power
 /// @return b raised to the power of n
 double exponentiation(const double b, const int n) {
+  constexpr double max_double = std::numeric_limits<double>::max();
+
   if (n < 0) {
     throw(std::invalid_argument("can not raise to negative power"));
   } else if (!n) {
@@ -40,10 +54,10 @@ double squareroot(const double num) {
   return guess;
 }
 
-/// @brief
+/// @brief get the root of a linear equation
 /// @param a the coefficient of the variable raised to power of 1
 /// @param b the constant
-/// @return
+/// @return the root
 double linear_equation_solver(const double slope, const double intercept) {
   if (!slope) {
     throw std::invalid_argument("'slope' can not be 0");
@@ -60,21 +74,25 @@ double linear_equation_solver(const double slope, const double intercept) {
 /// @param b the coefficient of the variable raised to power of 1
 /// @param c the constant
 /// @return the roots of the equation
-std::vector<double> quadratic_equation_solver(const double a, const double b,
-                                              const double c) {
+std::vector<std::variant<double, Complex>> quadratic_equation_solver(
+    const double a, const double b, const double c) {
   if (!a) {
     throw(std::invalid_argument("'a' can not be 0"));
   }
   double discriminant{utils::exponentiation(b, 2) - (4 * a * c)};
 
   if (!discriminant) {
-    return std::vector<double>{-b / (2 * a) + 0.0};
+    return std::vector<std::variant<double, Complex>>{-b / (2 * a) + 0.0};
   } else if (discriminant > 0) {
-    return std::vector<double>{
+    return std::vector<std::variant<double, Complex>>{
         (-b + utils::squareroot(discriminant)) / (2 * a) + 0.0,
         (-b - utils::squareroot(discriminant)) / (2 * a) + 0.0};
   }
-  throw std::invalid_argument("complex solutions are not supported");
+  return std::vector<std::variant<double, Complex>>{
+      Complex{-b / (2 * a) + 0.0,
+              -(utils::squareroot(-discriminant) / (2 * a) + 0.0)},
+      Complex{-b / (2 * a) + 0.0,
+              (utils::squareroot(-discriminant) / (2 * a) + 0.0)}};
 }
 
 }  // namespace utils

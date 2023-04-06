@@ -4,6 +4,7 @@
 #include <variant>
 
 #include "parser.h"
+#include "utils.h"
 #include "visitors.h"
 
 class Interpreter {
@@ -11,9 +12,12 @@ class Interpreter {
   using node_t = std::variant<BinaryExpr, UnaryExpr, Term>;
   Interpreter(Tree& t);
 
-  void transpose();
-  void evaluate();
+  char   findVar() const;
+  double findCoef(const char var, const int exp) const;
+  void   transpose();
+  void   evaluate();
 
  private:
-  Tree tree;
+  RpnVisitor rpn;
+  Tree       tree;
 };

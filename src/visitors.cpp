@@ -6,30 +6,18 @@ PrettyPrint::PrettyPrint(int levels)
 void PrettyPrint::operator()(const BinaryExpr& expr) {
   int offset = width / utils::exponentiation(2, level);
 
-  std::cout << std::string(width, ' ') << static_cast<char>(expr.oper) << '\n';
-
-  width -= offset;
-  level += 1;
   std::visit(*this, *expr.left);
-  width += offset;
-  level -= 1;
-
-  width += offset;
-  level += 1;
   std::visit(*this, *expr.right);
-  width -= offset;
-  level -= 1;
-  std::cout << '\n';
 }
 
 void PrettyPrint::operator()(const UnaryExpr& expr) {}
 
-void PrettyPrint::operator()(const Term& expr) {
-  int offset = width / utils::exponentiation(2, level);
+void PrettyPrint::operator()(const Term& expr) {}
 
-  width -= offset;
-  std::cout << std::string(width, ' ') << (expr);
-  width += offset;
+void PrettyPrint::buildQueue() {
+  while (!q.empty()) {
+    QueueElem el = q.front();
+  }
 }
 
 /* Visitors */
@@ -82,6 +70,7 @@ void RpnVisitor::evaluate(const BinaryExpr& expr, Term term) {
   if (expr.oper == Token::Kind::kMinus) {
     term = -term;
   }
+
   const auto [it, success] = terms.insert(
       std::make_pair(std::make_pair(term.getVar(), term.getExp()), term));
   if (!success) {

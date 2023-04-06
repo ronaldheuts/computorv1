@@ -12,6 +12,14 @@ Token Lexer::number() {
   double d{0};
   scanner.unget();
   scanner >> d;
+
+  if (d > std::numeric_limits<int>::max() ||
+      d < std::numeric_limits<int>::min()) {
+    throw std::invalid_argument(
+        "input number is too big, permitted range is: [" +
+        std::to_string(std::numeric_limits<int>::min()) + ", " +
+        std::to_string(std::numeric_limits<int>::max()) + "]");
+  }
   return Token{Token::Kind::kNumber, d};
 }
 
@@ -32,8 +40,6 @@ Token Lexer::get(void) {
       case '/':
       case '^':
       case '=':
-      case '(':
-      case ')':
         return Token{Token::Kind{ch}, {ch}};
       default: {
         if (std::isdigit(ch)) {

@@ -14,8 +14,6 @@ struct Token {
     kAsterisk = '*',
     kSlash = '/',
     kCaret = '^',
-    kLeftParen = '(',
-    kRightParen = ')',
     kEqual = '=',
   };
 

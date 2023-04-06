@@ -2,7 +2,7 @@
 
 /* Helper functions */
 
-/// @brief check if two terms (e.g. X^2) share the same variables and exponents
+/// @brief check if two terms (e.g. X^2) share the same variable and exponent
 bool likeTerms(const Term& lhs, const Term& rhs) {
   return lhs.getVar() == rhs.getVar() && lhs.getExp() == rhs.getExp();
 }

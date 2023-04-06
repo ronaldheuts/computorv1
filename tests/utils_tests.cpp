@@ -106,29 +106,33 @@ TEST(quadratic_equation_solver, zeroZeroZero) {
 
 /* discriminant is 0 */
 TEST(quadratic_equation_solver, oneZeroZero) {
-  auto result = utils::quadratic_equation_solver(1, 0, 0);
-  EXPECT_EQ(result.size(), 1);
-  EXPECT_EQ(result.at(0), 0);
+  auto actual = utils::quadratic_equation_solver(1, 0, 0);
+  EXPECT_EQ(actual.size(), 1);
+  EXPECT_EQ(std::get<double>(actual.at(0)), 0);
 }
 
 /* discriminant is positive */
 TEST(quadratic_equation_solver, doubleSolution) {
-  auto result = utils::quadratic_equation_solver(1, 1, 0);
-  EXPECT_EQ(result.size(), 2);
-  EXPECT_EQ(result.at(0), 0);
-  EXPECT_EQ(result.at(1), -1);
+  auto actual = utils::quadratic_equation_solver(1, 1, 0);
+  EXPECT_EQ(actual.size(), 2);
+  EXPECT_EQ(std::get<double>(actual.at(0)), 0);
+  EXPECT_EQ(std::get<double>(actual.at(1)), -1);
 }
 
 TEST(quadratic_equation_solver, singleSolution) {
-  auto result = utils::quadratic_equation_solver(1, 4, 4);
-  EXPECT_EQ(result.size(), 1);
-  EXPECT_EQ(result.at(0), -2);
+  auto actual = utils::quadratic_equation_solver(1, 4, 4);
+  EXPECT_EQ(actual.size(), 1);
+  EXPECT_EQ(std::get<double>(actual.at(0)), -2);
 }
 
-/* complex solution */
+/* discriminant is negative ergo complex solution */
 TEST(quadratic_equation_solver, complexSolution) {
-  EXPECT_THROW(utils::quadratic_equation_solver(8, 16, 16),
-               std::invalid_argument);
+  auto actual = utils::quadratic_equation_solver(3, 3, 4);
+  EXPECT_EQ(actual.size(), 2);
+  EXPECT_EQ(std::get<utils::Complex>(actual.at(0)).real, -0.5);
+  EXPECT_EQ(std::get<utils::Complex>(actual.at(0)).imag, -1.0408330019191296);
+  EXPECT_EQ(std::get<utils::Complex>(actual.at(1)).real, -0.5);
+  EXPECT_EQ(std::get<utils::Complex>(actual.at(1)).imag, 1.0408330019191296);
 }
 
 /* linear equation solver */

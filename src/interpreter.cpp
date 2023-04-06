@@ -4,10 +4,10 @@
 
 inline void printTerms(const std::vector<Term>& terms) {
   std::cout << "number of terms: " << terms.size() << "\n";
-  for (auto& x : terms) {
-    std::cout << "[ " << x.getCoe();
-    if (x.getVar()) {
-      std::cout << " * " << x.getVar() << " ^ " << x.getExp();
+  for (const auto& term : terms) {
+    std::cout << "[ " << term.getCoe();
+    if (term.getVar()) {
+      std::cout << " * " << term.getVar() << " ^ " << term.getExp();
     }
     std::cout << " ]\n";
   }
@@ -32,8 +32,8 @@ inline bool sameVars(const std::map<std::pair<char, int>, Term>& terms) {
   const auto check = terms.rbegin()->second;
 
   if (!isConstant(check)) {
-    for (const auto& x : terms) {
-      if (!isConstant(x.second) && !sameVars(x.second, check)) {
+    for (const auto& term : terms) {
+      if (!isConstant(term.second) && !sameVars(term.second, check)) {
         return false;
       }
     }
@@ -52,7 +52,7 @@ inline bool validDegree(const std::map<std::pair<char, int>, Term>& terms) {
   return true;
 }
 
-bool solvable(const std::map<std::pair<char, int>, Term>& terms) {
+inline bool solvable(const std::map<std::pair<char, int>, Term>& terms) {
   if (terms.empty()) {
     throw(std::invalid_argument("no terms provided"));
   }
@@ -67,11 +67,13 @@ bool solvable(const std::map<std::pair<char, int>, Term>& terms) {
   return true;
 }
 
-void printReducedForm(const std::map<std::pair<char, int>, Term>& terms) {
+inline void printReducedForm(
+    const std::map<std::pair<char, int>, Term>& terms) {
   if (terms.empty()) {
     throw(std::invalid_argument("no terms provided"));
   }
 
+  std::cout << "Reduced form: ";
   for (auto it = terms.begin(); it != terms.end(); ++it) {
     if (it == terms.begin()) {
       std::cout << it->second << " ";
@@ -84,63 +86,73 @@ void printReducedForm(const std::map<std::pair<char, int>, Term>& terms) {
   std::cout << "= 0\n";
 }
 
-bool isEquation(Interpreter::node_t& expr) {
-  auto result = std::get_if<BinaryExpr>(&expr);
-
-  if (result && result->oper == Token::Kind::kEqual) {
-    return true;
-  }
-  return false;
-}
-
 /* Interpreter */
 
 Interpreter::Interpreter(Tree& t) : tree{} { tree.setRoot(std::move(t.root)); }
 
 /// @brief move quantities across the equal sign of the equation
 void Interpreter::transpose() {
-  if (!isEquation(tree.getRoot())) {
-    throw(std::invalid_argument("not an equation"));
+  if (!std::holds_alternative<BinaryExpr>(tree.getRoot())) {
+    throw(std::invalid_argument("expression is not an equation"));
   }
   std::visit(TransposeVisitor{}, *std::get<BinaryExpr>(tree.getRoot()).right);
 }
 
-/// @brief attempt to evaluate the equation
-void Interpreter::evaluate() {
-  RpnVisitor rpn{};
+char Interpreter::findVar() const {
+  auto found = rpn.terms.rbegin();
 
-  std::visit(PrettyPrint{5}, tree.getRoot());
+  if (found != rpn.terms.rend()) {
+    return found->second.getVar();
+  }
+  return 0;
+}
+
+double Interpreter::findCoef(const char var, const int exp) const {
+  auto found = rpn.terms.find(std::make_pair(var, exp));
+
+  if (found != rpn.terms.end()) {
+    return found->second.getCoe();
+  }
+  return 0;
+}
+
+/// @brief evaluate the equation
+void Interpreter::evaluate() {
+  constexpr int exponentTwo = 2;
+  constexpr int exponentOne = 1;
+  constexpr int exponentNone = 0;
 
   transpose();
+  if (!std::holds_alternative<BinaryExpr>(tree.getRoot())) {
+    throw std::runtime_error("expression is not an equation");
+  }
+
   rpn.evaluate((std::get<BinaryExpr>(tree.getRoot())),
                std::visit(rpn, tree.getRoot()));
-
-  std::cout << "Reduced form: ";
   printReducedForm(rpn.terms);
-
   std::cout << "Polynomial degree: " << getDegree(rpn.terms) << '\n';
+  solvable(rpn.terms);
 
-  char   var = rpn.terms.rbegin()->second.getVar();
-  double a = rpn.terms.find(std::make_pair(var, 2))->second.getCoe();
-  double b = rpn.terms.find(std::make_pair(var, 1))->second.getCoe();
-  double c = rpn.terms.find(std::make_pair(var, 0))->second.getCoe();
+  char   var = findVar();
+  double a = findCoef(var, exponentTwo);
+  double b = findCoef(var, exponentOne);
+  double c = findCoef(var, exponentNone);
 
-  std::vector<double> solutions;
+  std::vector<std::variant<double, utils::Complex>> solutions;
 
   if (!a) {
     solutions.emplace_back(utils::linear_equation_solver(b, c));
   } else {
     solutions = utils::quadratic_equation_solver(a, b, c);
   }
-
   if (solutions.empty()) {
-    throw std::invalid_argument("complex solutions not supported\n");
+    throw std::invalid_argument("no solution available\n");
   } else if (solutions.size() == 1) {
     std::cout << "The solution is:\n";
   } else if (solutions.size() == 2) {
     std::cout << "The solutions are:\n";
   }
-  for (const auto& x : solutions) {
-    std::cout << std::fixed << x << '\n';
+  for (int i = 0; i < solutions.size(); ++i) {
+    std::visit(utils::ComplexVisitor{}, solutions.at(i));
   }
 }
