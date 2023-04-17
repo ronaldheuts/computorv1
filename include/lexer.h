@@ -18,6 +18,7 @@ class Lexer {
   Token peek(void);
   void  putback(Token);
   void  stream(const std::string &);
+  bool  isready() const;
 
  private:
   Lexer(const Lexer &);
@@ -26,5 +27,6 @@ class Lexer {
 
   std::istringstream scanner;
   Token              buffer;
+  bool               ready;
   bool               full;
 };

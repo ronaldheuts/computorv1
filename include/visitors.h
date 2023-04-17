@@ -58,6 +58,7 @@ struct RpnVisitor {
 
   RpnVisitor();
 
+  void addTerm(std::pair<std::pair<char, int>, Term> term);
   void evaluate(const BinaryExpr &expr, Term term);
   Term operator()(const BinaryExpr &expr);
   Term operator()(const UnaryExpr &expr);

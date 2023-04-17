@@ -2,11 +2,15 @@
 
 /* Lexer */
 
-Lexer::Lexer() : scanner{}, buffer{}, full{false} {}
+Lexer::Lexer() : scanner{}, buffer{}, ready{false}, full{false} {}
 
-Lexer::Lexer(const std::string &s) : scanner{s}, buffer{}, full{false} {}
+Lexer::Lexer(const std::string &s)
+    : scanner{s}, buffer{}, ready{true}, full{false} {}
 
-void Lexer::stream(const std::string &s) { scanner = std::istringstream{s}; }
+void Lexer::stream(const std::string &s) {
+  scanner = std::istringstream{s};
+  ready = true;
+}
 
 Token Lexer::number() {
   double d{0};
@@ -15,15 +19,21 @@ Token Lexer::number() {
 
   if (d > std::numeric_limits<int>::max() ||
       d < std::numeric_limits<int>::min()) {
+    ready = false;
     throw std::invalid_argument(
-        "input number is too big, permitted range is: [" +
+        "input number is too big; permitted range is: [" +
         std::to_string(std::numeric_limits<int>::min()) + ", " +
         std::to_string(std::numeric_limits<int>::max()) + "]");
   }
   return Token{Token::Kind::kNumber, d};
 }
 
+bool Lexer::isready() const { return ready; }
+
 Token Lexer::get(void) {
+  if (!isready()) {
+    throw std::invalid_argument("can not tokenize empty input string");
+  }
   if (full) {
     full = false;
     return buffer;
@@ -49,7 +59,9 @@ Token Lexer::get(void) {
         } else if (scanner.eof()) {
           return Token{Token::Kind::kEnd};
         } else {
-          throw(std::invalid_argument("unknown token"));
+          ready = false;
+          throw std::invalid_argument(std::string{"character not supported: "} +
+                                      std::string{ch});
         }
       }
     }
@@ -58,6 +70,7 @@ Token Lexer::get(void) {
 
 void Lexer::putback(Token token) {
   if (full) {
+    ready = false;
     throw(std::invalid_argument("buffer full"));
   }
   buffer = token;

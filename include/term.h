@@ -31,7 +31,6 @@ class Term {
 std::ostream &operator<<(std::ostream &os, const Term &lhs);
 
 bool likeTerms(const Term &lhs, const Term &rhs);
-bool unlikeTerms(const Term &lhs, const Term &rhs);
 bool sameVars(const Term &lhs, const Term &rhs);
 bool isConstant(const Term &lhs);
 

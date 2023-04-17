@@ -55,8 +55,8 @@ double squareroot(const double num) {
 }
 
 /// @brief get the root of a linear equation
-/// @param a the coefficient of the variable raised to power of 1
-/// @param b the constant
+/// @param slope the coefficient of the variable raised to power of 1
+/// @param intercept the constant
 /// @return the root
 double linear_equation_solver(const double slope, const double intercept) {
   if (!slope) {

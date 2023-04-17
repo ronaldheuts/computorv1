@@ -66,19 +66,23 @@ void TransposeVisitor::operator()(Term& expr) {
 /// @brief post-order traversal of the abstract syntax tree;
 RpnVisitor::RpnVisitor(void) : terms{} {}
 
-void RpnVisitor::evaluate(const BinaryExpr& expr, Term term) {
-  if (expr.oper == Token::Kind::kMinus) {
-    term = -term;
-  }
-
-  const auto [it, success] = terms.insert(
-      std::make_pair(std::make_pair(term.getVar(), term.getExp()), term));
+/// @brief try to insert term into a map, if a liketerm is known, evaluate.
+/// @param term to store
+void RpnVisitor::addTerm(std::pair<std::pair<char, int>, Term> term) {
+  const auto [it, success] = terms.insert(term);
   if (!success) {
-    it->second += term;
+    it->second += term.second;
   }
   if (!it->second) {
     terms.erase(it);
   }
+}
+
+void RpnVisitor::evaluate(const BinaryExpr& expr, Term term) {
+  if (expr.oper == Token::Kind::kMinus) {
+    term = -term;
+  }
+  addTerm(std::make_pair(std::make_pair(term.getVar(), term.getExp()), term));
 }
 
 Term RpnVisitor::operator()(const BinaryExpr& expr) {
@@ -88,15 +92,7 @@ Term RpnVisitor::operator()(const BinaryExpr& expr) {
   if (expr.oper == Token::Kind::kMinus) {
     rhs = -rhs;
   }
-  const auto [it, success] = terms.insert(
-      std::make_pair(std::make_pair(rhs.getVar(), rhs.getExp()), rhs));
-
-  if (!success) {
-    it->second += rhs;
-  }
-  if (!it->second) {
-    terms.erase(it);
-  }
+  addTerm(std::make_pair(std::make_pair(rhs.getVar(), rhs.getExp()), rhs));
   return lhs;
 }
 
@@ -104,8 +100,16 @@ Term RpnVisitor::operator()(const UnaryExpr& expr) {
   switch (expr.oper) {
     case Token::Kind::kMinus:
       return -std::visit(*this, *(expr.child));
-    case Token::Kind::kPlus:  // maybe remove
+    case Token::Kind::kPlus:
       return std::visit(*this, *(expr.child));
+    case Token::Kind::kEnd:
+    case Token::Kind::kNumber:
+    case Token::Kind::kVariable:
+    case Token::Kind::kAsterisk:
+    case Token::Kind::kSlash:
+    case Token::Kind::kCaret:
+    case Token::Kind::kEqual:
+      throw std::invalid_argument("Unexpected token error");
   }
 }
 
