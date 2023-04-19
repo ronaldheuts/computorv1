@@ -11,20 +11,11 @@ void Lexer::stream(const std::string &s) {
   scanner = std::istringstream{s};
   ready = true;
 }
-
+#include <iostream>
 Token Lexer::number() {
   double d{0};
   scanner.unget();
   scanner >> d;
-
-  if (d > std::numeric_limits<int>::max() ||
-      d < std::numeric_limits<int>::min()) {
-    ready = false;
-    throw std::invalid_argument(
-        "input number is too big; permitted range is: [" +
-        std::to_string(std::numeric_limits<int>::min()) + ", " +
-        std::to_string(std::numeric_limits<int>::max()) + "]");
-  }
   return Token{Token::Kind::kNumber, d};
 }
 

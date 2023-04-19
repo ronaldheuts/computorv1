@@ -25,7 +25,7 @@ double exponentiation(const double b, const int n) {
   constexpr double max_double = std::numeric_limits<double>::max();
 
   if (n < 0) {
-    throw(std::invalid_argument("can not raise to negative power"));
+    throw std::invalid_argument("can not raise to negative power");
   } else if (!n) {
     return 1;
   } else if (!b) {
@@ -77,7 +77,10 @@ double linear_equation_solver(const double slope, const double intercept) {
 std::vector<std::variant<double, Complex>> quadratic_equation_solver(
     const double a, const double b, const double c) {
   if (!a) {
-    throw(std::invalid_argument("'a' can not be 0"));
+    throw std::invalid_argument("'a' can not be 0 in the quadratic formula");
+  }
+  if (!b && !c) {
+    return std::vector<std::variant<double, Complex>>{0.0};
   }
   double discriminant{utils::exponentiation(b, 2) - (4 * a * c)};
 

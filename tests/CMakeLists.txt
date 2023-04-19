@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project(computorv1)
 
-add_executable(computorv1_tests utils.tests.cpp lexer.tests.cpp)
+add_executable(computorv1_tests utils.tests.cpp lexer.tests.cpp parser.tests.cpp interpreter.tests.cpp)
 
 target_sources(computorv1_tests PUBLIC
   ../src/lexer.cpp

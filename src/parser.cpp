@@ -38,6 +38,8 @@ https://mdkrajnak.github.io/ebnftest/
 
 Parser::Parser() : lexer{} {}
 
+Parser::Parser(const std::string& s) { lexer.stream(s); }
+
 void Parser::stream(const std::string& s) { lexer.stream(s); }
 
 Token Parser::peek() { return lexer.peek(); }
@@ -55,7 +57,7 @@ std::unique_ptr<Parser::node_t> Parser::term(void) {
   if (check(peek().kind, Token::Kind::kNumber)) {
     expr.setCoe(std::get<double>(advance().value));
   } else {
-    throw(std::invalid_argument("missing number"));
+    throw(std::invalid_argument("missing number in term (ex. \"42\" * X^2)"));
   }
   if (!expr.getCoe() && check(peek().kind, Token::Kind::kEnd)) {
     return std::make_unique<node_t>(expr);
@@ -63,22 +65,22 @@ std::unique_ptr<Parser::node_t> Parser::term(void) {
   if (check(peek().kind, Token::Kind::kAsterisk)) {
     advance();
   } else {
-    throw(std::invalid_argument("missing asterisk"));
+    throw(std::invalid_argument("missing asterisk in term (ex. 42 \"*\" X^2)"));
   }
   if (check(peek().kind, Token::Kind::kVariable)) {
     expr.setVar(std::get<char>(advance().value));
   } else {
-    throw(std::invalid_argument("missing variable"));
+    throw(std::invalid_argument("missing variable in term (ex. 42 * \"X\"^2)"));
   }
   if (check(peek().kind, Token::Kind::kCaret)) {
     advance();
   } else {
-    throw(std::invalid_argument("missing caret"));
+    throw(std::invalid_argument("missing caret in term (ex. 42 * X\"^\"2)"));
   }
   if (check(peek().kind, Token::Kind::kNumber)) {
     expr.setExp(std::get<double>(advance().value));
   } else {
-    throw(std::invalid_argument("missing exponent"));
+    throw(std::invalid_argument("missing exponent in term (ex. 42 * X^\"2\")"));
   }
   return std::make_unique<node_t>(expr);
 }
@@ -143,13 +145,11 @@ std::unique_ptr<Parser::node_t> Parser::equation(void) {
     }
     return std::make_unique<node_t>(BinaryExpr{current, expr, rhs});
   }
-  // if (!check(peek(), Token::Kind::kEnd)) {
-  //   throw(std::runtime_error("invalid grammar"));
-  // }
   return expr;
 }
 
-void Parser::parse(void) { tree.setRoot(equation()); }
+/// @brief Consume tokens from lexer and build AST.
+void Parser::parse() { tree.setRoot(equation()); }
 
 Tree& Parser::getTree() { return tree; }
 

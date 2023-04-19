@@ -1,8 +1,8 @@
+#include "utils.h"
+
 #include <gtest/gtest.h>
 
 #include <cmath>
-
-#include "utils.h"
 
 /* absolute value */
 

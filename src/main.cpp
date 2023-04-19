@@ -6,6 +6,8 @@
 2. be specific with user errors - where did it go wrong
 */
 
+// todo: 42*X^0 = 42*X^0 (each real number is a solution)
+
 // "5 * X^0 + 3 * X^1 + 3 * X^2 = 1 * X^0 + 0 * X^1"
 // "5 * X^0 + 4 * X^1 - 9.3 * X^2 = 1 * X^0"
 // "5 * X^0 + 4 * X^1 = 4 * X^0"
@@ -31,6 +33,6 @@ int main(int argc, char *argv[]) try {
   std::cerr << e.what();
   return 1;
 } catch (...) {
-  std::cerr << std::string_view("unknown error occurred");
+  std::cerr << "unknown error occurred";
   return 2;
 }

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <map>
-#include <queue>  // may remove
 #include <variant>
 
 #include "parser.h"
@@ -12,35 +11,9 @@ struct UnaryExpr;
 struct Term;
 
 struct PrintVisitor {
-  int         height;
-  int         levels;
-  std::string prefix;
+  int height;
 
   PrintVisitor();
-
-  void operator()(const BinaryExpr &expr);
-  void operator()(const UnaryExpr &expr);
-  void operator()(const Term &expr);
-};
-
-struct QueueElem {
-  enum class Orientation { kLeft, kRight, kCenter };
-
-  std::string value;
-  int         level;
-  int         pos;
-  Orientation orientation;
-};
-
-struct PrettyPrint {
-  int levels;
-  int level;
-  int width;
-  // QueueElem             buffer;
-  std::queue<QueueElem> q;
-
-  PrettyPrint(int levels);
-  void buildQueue();
 
   void operator()(const BinaryExpr &expr);
   void operator()(const UnaryExpr &expr);

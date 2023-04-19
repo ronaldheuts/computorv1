@@ -15,4 +15,4 @@ Tree::Tree() : root{} {}
 
 void Tree::setRoot(std::unique_ptr<node_t> expr) { root = std::move(expr); }
 
-Tree::node_t& Tree::getRoot() const { return *root; }
+std::unique_ptr<Tree::node_t>& Tree::getRoot() { return root; }

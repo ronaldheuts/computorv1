@@ -37,12 +37,14 @@ class Tree {
   using node_t = std::variant<BinaryExpr, UnaryExpr, Term>;
 
   Tree();
+
+  void                     setRoot(std::unique_ptr<node_t> expr);
+  std::unique_ptr<node_t> &getRoot();
+
+ private:
   Tree(const Tree &) = delete;
   Tree &operator=(const Tree &) = delete;
   Tree &operator=(const Tree &&) = delete;
-
-  void    setRoot(std::unique_ptr<node_t> expr);
-  node_t &getRoot() const;
 
   std::unique_ptr<node_t> root;
 };
