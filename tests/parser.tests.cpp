@@ -9,20 +9,20 @@ TEST(parser, noTokens) {
 
 TEST(parser, missingAsterisk) {
   Parser par{"1"};
-  EXPECT_THROW(par.parse(), std::invalid_argument);
+  EXPECT_THROW(par.parse(), grammarError);
 }
 
 TEST(parser, missingVariable) {
   Parser par{"1 *"};
-  EXPECT_THROW(par.parse(), std::invalid_argument);
+  EXPECT_THROW(par.parse(), grammarError);
 }
 
 TEST(parser, missingCaret) {
   Parser par{"1 * X"};
-  EXPECT_THROW(par.parse(), std::invalid_argument);
+  EXPECT_THROW(par.parse(), grammarError);
 }
 
 TEST(parser, missingExponent) {
   Parser par{"1 * X^"};
-  EXPECT_THROW(par.parse(), std::invalid_argument);
+  EXPECT_THROW(par.parse(), grammarError);
 }

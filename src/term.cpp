@@ -21,17 +21,15 @@ Term::Term(const double c) : coe{c}, var{0}, exp{0} {}
 
 Term::Term(const double c, const char v) : coe{c}, var{v}, exp{0} {
   if (v > 'Z' || 'A' > v) {
-    throw(std::invalid_argument(
-        "the variable in a term must be a capital letter"));
+    throw grammarError("the variable in a term must be a capital letter");
   }
 }
 
 Term::Term(const double c, const char v, const int e) : coe{c}, var{v}, exp{e} {
   if (v > 'Z' || 'A' > v) {
-    throw(std::invalid_argument(
-        "the variable in a term must be a capital letter"));
+    throw grammarError("the variable in a term must be a capital letter");
   } else if (e < 0) {
-    throw(std::invalid_argument("the exponent in a term must be positive"));
+    throw grammarError("the exponent in a term must be positive");
   }
 }
 
@@ -55,18 +53,22 @@ Term& Term::operator=(const Term& rhs) {
 }
 
 Term& Term::operator-=(const Term& rhs) {
-  *this - rhs;
+  *this = *this - rhs;
   return *this;
 }
 
 Term& Term::operator+=(const Term& rhs) {
-  coe += rhs.getCoe();
+  *this = *this + rhs;
   return *this;
 }
 
+/// @brief negate operator
 Term Term::operator-() const {
   Term term{*this};
 
+  if (!getCoe()) {
+    throw std::runtime_error("can not negate 0");
+  }
   term.setCoe(-getCoe());
   return term;
 }
@@ -79,42 +81,44 @@ std::ostream& operator<<(std::ostream& os, const Term& lhs) {
   return os;
 }
 
-Term operator+(const Term& lhs, const Term& rhs) {
-  if (likeTerms(lhs, rhs)) {
-    return Term{lhs.getCoe() + rhs.getCoe(), lhs.getVar(), lhs.getExp()};
+Term Term::operator+(const Term& rhs) {
+  if (likeTerms(*this, rhs)) {
+    return Term{getCoe() + rhs.getCoe(), getVar(), getExp()};
   }
-  throw(std::runtime_error("can not add unlike terms"));
+  throw std::runtime_error("can not add unlike terms");
 }
 
-Term operator-(const Term& lhs, const Term& rhs) {
-  if (likeTerms(lhs, rhs)) {
-    return Term{lhs.getCoe() - rhs.getCoe(), lhs.getVar(), lhs.getExp()};
+Term Term::operator-(const Term& rhs) {
+  if (likeTerms(*this, rhs)) {
+    return Term{getCoe() - rhs.getCoe(), getVar(), getExp()};
   }
-  throw(std::runtime_error("can not subtract unlike terms"));
+  throw std::runtime_error("can not subtract unlike terms");
 }
 
-Term operator*(const Term& lhs, const Term& rhs) {
-  if (isConstant(lhs)) {
-    return Term{lhs.getCoe() * rhs.getCoe(), rhs.getVar(), rhs.getExp()};
+Term Term::operator*(const Term& rhs) {
+  if (isConstant(*this)) {
+    return Term{getCoe() * rhs.getCoe(), rhs.getVar(), rhs.getExp()};
   } else if (isConstant(rhs)) {
-    return Term{lhs.getCoe() * rhs.getCoe(), lhs.getVar(), lhs.getExp()};
-  } else if (sameVars(lhs, rhs)) {
-    return Term{lhs.getCoe() * rhs.getCoe(), lhs.getVar(),
-                lhs.getExp() + rhs.getExp()};
+    return Term{getCoe() * rhs.getCoe(), getVar(), getExp()};
+  } else if (sameVars(*this, rhs)) {
+    return Term{getCoe() * rhs.getCoe(), getVar(), getExp() + rhs.getExp()};
   }
-  throw(std::runtime_error("can not factor unlike terms"));
+  throw std::runtime_error("can not factor unlike terms");
 }
 
-Term operator/(const Term& lhs, const Term& rhs) {
-  if (isConstant(lhs)) {
-    return Term{lhs.getCoe() / rhs.getCoe(), rhs.getVar(), rhs.getExp()};
+Term Term::operator/(const Term& rhs) {
+  if (!getCoe()) {
+    throw std::runtime_error("can not divide zero");
+  } else if (!rhs.getCoe()) {
+    throw std::runtime_error("can not divide by zero");
+  } else if (isConstant(*this)) {
+    return Term{getCoe() / rhs.getCoe(), rhs.getVar(), rhs.getExp()};
   } else if (isConstant(rhs)) {
-    return Term{lhs.getCoe() / rhs.getCoe(), lhs.getVar(), lhs.getExp()};
-  } else if (sameVars(lhs, rhs)) {
-    return Term{lhs.getCoe() / rhs.getCoe(), lhs.getVar(),
-                lhs.getExp() + rhs.getExp()};
+    return Term{getCoe() / rhs.getCoe(), getVar(), getExp()};
+  } else if (sameVars(*this, rhs)) {
+    return Term{getCoe() / rhs.getCoe(), getVar(), getExp() + rhs.getExp()};
   }
-  throw(std::runtime_error("can not divide unlike terms"));
+  throw std::runtime_error("can not divide unlike terms");
 }
 
 bool operator<(const Term& lhs, const Term& rhs) {

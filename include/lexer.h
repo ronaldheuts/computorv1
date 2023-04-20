@@ -3,6 +3,7 @@
 #include <sstream>
 #include <stdexcept>
 
+#include "exceptions.h"
 #include "token.h"
 
 class Lexer {
@@ -18,7 +19,7 @@ class Lexer {
   Token peek(void);
   void  putback(Token);
   void  stream(const std::string &);
-  bool  isready() const;
+  bool  isReady() const;
 
  private:
   Lexer(const Lexer &);

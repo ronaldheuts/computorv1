@@ -11,7 +11,7 @@ void Lexer::stream(const std::string &s) {
   scanner = std::istringstream{s};
   ready = true;
 }
-#include <iostream>
+
 Token Lexer::number() {
   double d{0};
   scanner.unget();
@@ -19,10 +19,10 @@ Token Lexer::number() {
   return Token{Token::Kind::kNumber, d};
 }
 
-bool Lexer::isready() const { return ready; }
+bool Lexer::isReady() const { return ready; }
 
 Token Lexer::get(void) {
-  if (!isready()) {
+  if (!isReady()) {
     throw std::invalid_argument("can not tokenize empty input string");
   }
   if (full) {
@@ -51,8 +51,8 @@ Token Lexer::get(void) {
           return Token{Token::Kind::kEnd};
         } else {
           ready = false;
-          throw std::invalid_argument(std::string{"character not supported: "} +
-                                      std::string{ch});
+          throw grammarError(std::string{"character not supported: "} +
+                             std::string{ch});
         }
       }
     }
@@ -62,7 +62,7 @@ Token Lexer::get(void) {
 void Lexer::putback(Token token) {
   if (full) {
     ready = false;
-    throw(std::invalid_argument("buffer full"));
+    throw(std::runtime_error("buffer full"));
   }
   buffer = token;
   full = true;

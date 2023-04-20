@@ -1,8 +1,10 @@
 #pragma once
 
 #include <iostream>
+#include <stdexcept>
 #include <variant>
 
+#include "exceptions.h"
 #include "parser.h"
 #include "utils.h"
 #include "visitors.h"

@@ -57,12 +57,12 @@ bool solvable(const std::map<std::pair<char, int>, Term>& terms) {
     throw std::invalid_argument("no terms provided");
   }
   if (!validDegree(terms)) {
-    throw(std::invalid_argument(
-        "can not solve equation with a degree higher than 2"));
+    throw std::invalid_argument(
+        "can not solve equation with a degree higher than 2");
   }
   if (!sameVars(terms)) {
-    throw(std::invalid_argument(
-        "can not solve equation with different variables"));
+    throw std::invalid_argument(
+        "can not solve equation with different variables");
   }
   return true;
 }
@@ -129,7 +129,7 @@ void Interpreter::evaluate() {
 
   transpose();
   if (!std::holds_alternative<BinaryExpr>(*tree.getRoot())) {
-    throw std::invalid_argument("expression is not an equation");
+    throw grammarError("expression is not an equation (ex. 42 * X^2 = 0)");
   }
 
   rpn.evaluate((std::get<BinaryExpr>(*tree.getRoot())),
@@ -155,7 +155,7 @@ void Interpreter::evaluate() {
     solutions = utils::quadratic_equation_solver(a, b, c);
   }
   if (solutions.empty()) {
-    throw std::invalid_argument("no solution available\n");
+    throw std::runtime_error("no solution available\n");
   } else if (solutions.size() == 1) {
     std::cout << "The solution is:\n";
   } else if (solutions.size() == 2) {

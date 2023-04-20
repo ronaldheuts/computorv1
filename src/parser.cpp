@@ -57,7 +57,7 @@ std::unique_ptr<Parser::node_t> Parser::term(void) {
   if (check(peek().kind, Token::Kind::kNumber)) {
     expr.setCoe(std::get<double>(advance().value));
   } else {
-    throw(std::invalid_argument("missing number in term (ex. \"42\" * X^2)"));
+    throw grammarError("missing number in term (ex. \"42\" * X^2)");
   }
   if (!expr.getCoe() && check(peek().kind, Token::Kind::kEnd)) {
     return std::make_unique<node_t>(expr);
@@ -65,22 +65,22 @@ std::unique_ptr<Parser::node_t> Parser::term(void) {
   if (check(peek().kind, Token::Kind::kAsterisk)) {
     advance();
   } else {
-    throw(std::invalid_argument("missing asterisk in term (ex. 42 \"*\" X^2)"));
+    throw grammarError("missing asterisk in term (ex. 42 \"*\" X^2)");
   }
   if (check(peek().kind, Token::Kind::kVariable)) {
     expr.setVar(std::get<char>(advance().value));
   } else {
-    throw(std::invalid_argument("missing variable in term (ex. 42 * \"X\"^2)"));
+    throw grammarError("missing variable in term (ex. 42 * \"X\"^2)");
   }
   if (check(peek().kind, Token::Kind::kCaret)) {
     advance();
   } else {
-    throw(std::invalid_argument("missing caret in term (ex. 42 * X\"^\"2)"));
+    throw grammarError("missing caret in term (ex. 42 * X\"^\"2)");
   }
   if (check(peek().kind, Token::Kind::kNumber)) {
     expr.setExp(std::get<double>(advance().value));
   } else {
-    throw(std::invalid_argument("missing exponent in term (ex. 42 * X^\"2\")"));
+    throw grammarError("missing exponent in term (ex. 42 * X^\"2\")");
   }
   return std::make_unique<node_t>(expr);
 }
@@ -141,7 +141,7 @@ std::unique_ptr<Parser::node_t> Parser::equation(void) {
     advance();
     std::unique_ptr<node_t> rhs = expression();
     if (!check(peek(), Token::Kind::kEnd)) {
-      throw(std::runtime_error("invalid grammar"));
+      throw grammarError("missing end of equation token");
     }
     return std::make_unique<node_t>(BinaryExpr{current, expr, rhs});
   }
@@ -154,8 +154,8 @@ void Parser::parse() { tree.setRoot(equation()); }
 Tree& Parser::getTree() { return tree; }
 
 std::string Parser::prompt(void) {
-  constexpr std::string_view msg{
-      "Enter a quadratic equation (a * X^2 + b * X^1 + c * X^0 = 0): "};
+  constexpr std::string_view msg{"Enter a quadratic equation or 'q' to quit: "};
+
   std::string equation;
 
   /* to do: error handling around cin */

@@ -1,7 +1,8 @@
 #pragma once
 
 #include <iostream>
-#include <stdexcept>
+
+#include "exceptions.h"
 
 class Term {
  public:
@@ -13,7 +14,12 @@ class Term {
   Term &operator=(const Term &rhs);
   Term &operator-=(const Term &rhs);
   Term &operator+=(const Term &rhs);
-  Term  operator-() const;  // check this func
+  Term  operator-() const;
+
+  Term operator*(const Term &rhs);
+  Term operator/(const Term &rhs);
+  Term operator+(const Term &rhs);
+  Term operator-(const Term &rhs);
 
   double getCoe() const;
   void   setCoe(const double c);
@@ -33,11 +39,6 @@ std::ostream &operator<<(std::ostream &os, const Term &lhs);
 bool likeTerms(const Term &lhs, const Term &rhs);
 bool sameVars(const Term &lhs, const Term &rhs);
 bool isConstant(const Term &lhs);
-
-Term operator*(const Term &lhs, const Term &rhs);
-Term operator/(const Term &lhs, const Term &rhs);
-Term operator+(const Term &lhs, const Term &rhs);
-Term operator-(const Term &lhs, const Term &rhs);
 
 bool operator<(const Term &lhs, const Term &rhs);
 bool operator==(const Term &lhs, const Term &rhs);

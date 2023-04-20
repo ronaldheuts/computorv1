@@ -4,19 +4,19 @@
 
 TEST(lexer, defaultConstructor) {
   Lexer lexer{};
-  EXPECT_FALSE(lexer.isready());
+  EXPECT_FALSE(lexer.isReady());
 }
 
 TEST(lexer, setStream) {
   Lexer lexer{};
-  EXPECT_FALSE(lexer.isready());
+  EXPECT_FALSE(lexer.isReady());
   lexer.stream(std::string{"hello world"});
-  EXPECT_TRUE(lexer.isready());
+  EXPECT_TRUE(lexer.isReady());
 }
 
 TEST(lexer, paramConstructor) {
   Lexer lexer{std::string("hello world")};
-  EXPECT_TRUE(lexer.isready());
+  EXPECT_TRUE(lexer.isReady());
 }
 
 TEST(lexer, getEmpty) {
