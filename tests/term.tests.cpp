@@ -28,12 +28,20 @@ TEST(term, coefVarConstructor) {
   EXPECT_EQ(actual.getExp(), 0);
 }
 
+TEST(term, WrongVarConstructor) {
+  EXPECT_THROW((Term{42, 'x'}), std::runtime_error);
+}
+
 TEST(term, coefVarExpConstructor) {
   Term actual{42, 'X', 2};
 
   EXPECT_EQ(actual.getCoe(), 42);
   EXPECT_EQ(actual.getVar(), 'X');
   EXPECT_EQ(actual.getExp(), 2);
+}
+
+TEST(term, WrongExpConstructor) {
+  EXPECT_THROW((Term{42, 'X', -2}), std::runtime_error);
 }
 
 /* assignment operators */
@@ -212,31 +220,92 @@ TEST(term, zeroDivision) {
   Term rhs{0, 'X', 2};
 
   EXPECT_THROW(lhs / rhs, std::runtime_error);
+  EXPECT_THROW(rhs / lhs, std::runtime_error);
 }
 
-// TEST(term, wrongVarDivision) {
-//   Term lhs{4, 'X', 2};
-//   Term rhs{3, 'Y', 2};
+TEST(term, wrongVarDivision) {
+  Term lhs{12, 'X', 2};
+  Term rhs{4, 'Y', 2};
 
-//   EXPECT_THROW(lhs * rhs, std::runtime_error);
-// }
+  EXPECT_THROW(lhs / rhs, std::runtime_error);
+}
 
-// TEST(term, goodDivision) {
-//   Term lhs{4, 'X', 2};
-//   Term rhs{3, 'X', 2};
+TEST(term, goodDivision) {
+  Term lhs{12, 'X', 2};
+  Term rhs{4, 'X', 2};
 
-//   Term actual{lhs * rhs};
-//   EXPECT_EQ(actual.getCoe(), 12);
-//   EXPECT_EQ(actual.getVar(), 'X');
-//   EXPECT_EQ(actual.getExp(), 4);
-// }
+  Term actual{lhs / rhs};
+  EXPECT_EQ(actual.getCoe(), 3);
+  EXPECT_EQ(actual.getVar(), 'X');
+  EXPECT_EQ(actual.getExp(), 0);
+}
 
-// TEST(term, goodExpDivision) {
-//   Term lhs{4, 'X', 2};
-//   Term rhs{3, 'X', 8};
+TEST(term, goodExpDivision) {
+  Term lhs{12, 'X', 9};
+  Term rhs{4, 'X', 1};
 
-//   Term actual{lhs * rhs};
-//   EXPECT_EQ(actual.getCoe(), 12);
-//   EXPECT_EQ(actual.getVar(), 'X');
-//   EXPECT_EQ(actual.getExp(), 10);
-// }
+  Term actual{lhs / rhs};
+  EXPECT_EQ(actual.getCoe(), 3);
+  EXPECT_EQ(actual.getVar(), 'X');
+  EXPECT_EQ(actual.getExp(), 8);
+}
+
+/* likeTerms */
+
+TEST(likeTerms, differentVar) {
+  Term lhs{12, 'X', 2};
+  Term rhs{4, 'Y', 2};
+
+  EXPECT_FALSE(likeTerms(lhs, rhs));
+}
+
+TEST(likeTerms, differentExp) {
+  Term lhs{12, 'X', 5};
+  Term rhs{4, 'X', 2};
+
+  EXPECT_FALSE(likeTerms(lhs, rhs));
+}
+
+TEST(likeTerms, sameVarExp) {
+  Term lhs{12, 'X', 2};
+  Term rhs{4, 'X', 2};
+
+  EXPECT_TRUE(likeTerms(lhs, rhs));
+}
+
+/* sameVars */
+
+TEST(sameVars, differentVar) {
+  Term lhs{12, 'X', 2};
+  Term rhs{4, 'Y', 4};
+
+  EXPECT_FALSE(sameVars(lhs, rhs));
+}
+
+TEST(sameVars, sameVar) {
+  Term lhs{12, 'X', 2};
+  Term rhs{4, 'X', 4};
+
+  EXPECT_TRUE(sameVars(lhs, rhs));
+}
+
+/* isConstant */
+
+TEST(isConstant, withVar) {
+  Term lhs{12, 'X'};
+
+  EXPECT_FALSE(isConstant(lhs));
+}
+
+TEST(isConstant, withExp) {
+  Term lhs{12};
+
+  lhs.setExp(4);
+  EXPECT_FALSE(isConstant(lhs));
+}
+
+TEST(isConstant, withoutVar) {
+  Term lhs{12};
+
+  EXPECT_TRUE(isConstant(lhs));
+}

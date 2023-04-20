@@ -7,7 +7,7 @@ bool likeTerms(const Term& lhs, const Term& rhs) {
   return lhs.getVar() == rhs.getVar() && lhs.getExp() == rhs.getExp();
 }
 
-bool isConstant(const Term& lhs) { return !lhs.getVar(); }
+bool isConstant(const Term& term) { return !term.getVar() && !term.getExp(); }
 
 bool sameVars(const Term& lhs, const Term& rhs) {
   return lhs.getVar() == rhs.getVar();
@@ -67,7 +67,7 @@ Term Term::operator-() const {
   Term term{*this};
 
   if (!getCoe()) {
-    throw std::runtime_error("can not negate 0");
+    throw std::runtime_error("can not negate zero");
   }
   term.setCoe(-getCoe());
   return term;
@@ -116,7 +116,7 @@ Term Term::operator/(const Term& rhs) {
   } else if (isConstant(rhs)) {
     return Term{getCoe() / rhs.getCoe(), getVar(), getExp()};
   } else if (sameVars(*this, rhs)) {
-    return Term{getCoe() / rhs.getCoe(), getVar(), getExp() + rhs.getExp()};
+    return Term{getCoe() / rhs.getCoe(), getVar(), getExp() - rhs.getExp()};
   }
   throw std::runtime_error("can not divide unlike terms");
 }
