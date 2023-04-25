@@ -14,3 +14,9 @@ Getting more familiar with c++ and in particular about the following concepts:
 - writing tests using googletest framework.
 
 ## Installation and usage
+```
+git clone git@github.com:ronaldheuts/computorv1.git computorv1
+cd computorv1
+cmake -S . -B build
+cmake --build buid
+```
