@@ -149,18 +149,22 @@ std::unique_ptr<Parser::node_t> Parser::equation(void) {
 }
 
 /// @brief Consume tokens from lexer and build AST.
-void Parser::parse() { tree.setRoot(equation()); }
+bool Parser::parse() {
+  if (check(peek(), Token::Kind::kQuit)) {
+    std::cout << "quiting computorv1\n";
+    return false;
+  }
+  tree.setRoot(equation());
+  return true;
+}
 
 Tree& Parser::getTree() { return tree; }
 
 std::string Parser::prompt(void) {
   constexpr std::string_view msg{"Enter a quadratic equation or 'q' to quit: "};
+  std::string                equation;
 
-  std::string equation;
-
-  /* to do: error handling around cin */
   std::cout << msg;
   std::getline(std::cin, equation);
-
   return equation;
 }

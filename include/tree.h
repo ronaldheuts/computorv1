@@ -44,7 +44,6 @@ class Tree {
  private:
   Tree(const Tree &) = delete;
   Tree &operator=(const Tree &) = delete;
-  Tree &operator=(const Tree &&) = delete;
 
   std::unique_ptr<node_t> root;
 };

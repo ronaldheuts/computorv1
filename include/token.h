@@ -15,6 +15,7 @@ struct Token {
     kSlash = '/',
     kCaret = '^',
     kEqual = '=',
+    kQuit = 'q'
   };
 
   Token();

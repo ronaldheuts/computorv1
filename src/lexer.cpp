@@ -9,6 +9,7 @@ Lexer::Lexer(const std::string &s)
 
 void Lexer::stream(const std::string &s) {
   scanner = std::istringstream{s};
+  full = false;
   ready = true;
 }
 
@@ -35,6 +36,7 @@ Token Lexer::get(void) {
     switch (ch) {
       case ' ':
         continue;
+      case 'q':
       case '+':
       case '-':
       case '*':

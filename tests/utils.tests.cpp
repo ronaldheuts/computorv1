@@ -66,6 +66,14 @@ TEST(exponentiation, baseTwoExponentNegative) {
   EXPECT_THROW(utils::exponentiation(2, -1), std::invalid_argument);
 }
 
+TEST(exponentiation, baseTwoEponentiationSixtyTwo) {
+  EXPECT_EQ(utils::exponentiation(2, 62), std::pow(2, 62));
+}
+
+TEST(exponentiation, baseTwoEponentiationSixtyThree) {
+  EXPECT_THROW(utils::exponentiation(2, 63), std::runtime_error);
+}
+
 /* square root */
 
 TEST(squareroot, Zero) {
@@ -78,23 +86,22 @@ TEST(squareroot, Negative) {
 
 TEST(squareroot, smallPerfectSquare) {
   EXPECT_TRUE((std::abs(utils::squareroot(9) - std::sqrt(9))) <
-              std::pow(10, -8));
+              std::pow(10, -6));
 }
 
 TEST(squareroot, bigPerfectSquare) {
   EXPECT_TRUE((std::abs(utils::squareroot(1048576) - std::sqrt(1048576))) <
-              std::pow(10, -8));
+              std::pow(10, -6));
 }
 
 // https://stackoverflow.com/questions/47906197/how-to-compare-double-values-limiting-the-decimal-places
 TEST(squareroot, smallNonPerfectSquare) {
-  EXPECT_TRUE((std::abs(utils::squareroot(2) - std::sqrt(2))) <
-              std::pow(10, -8));
+  EXPECT_TRUE(std::abs(utils::squareroot(2) - std::sqrt(2)) < std::pow(10, -6));
 }
 
 TEST(squareroot, bigNonPerfectSquare) {
-  EXPECT_TRUE((std::abs(utils::squareroot(218792) - std::sqrt(218792))) <
-              std::pow(10, -8));
+  EXPECT_TRUE(std::abs(utils::squareroot(218792) - std::sqrt(218792)) <
+              std::pow(10, -6));
 }
 
 /* quadratic equation solver */

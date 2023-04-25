@@ -6,16 +6,14 @@
 #include "utils.h"
 #include "visitors.h"
 
-/* Parser */
-
 class Parser {
  public:
   using node_t = Tree::node_t;
   Parser();
   Parser(const std::string &s);
 
-  void                      parse();
   void                      stream(const std::string &s);
+  bool                      parse();
   [[nodiscard]] Tree       &getTree();
   [[nodiscard]] std::string prompt();
 

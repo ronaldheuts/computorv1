@@ -25,7 +25,7 @@ class Interpreter {
  private:
   Interpreter() = delete;
   Interpreter(const Interpreter&) = delete;
-  Interpreter operator=(const Interpreter&) = delete;
+  Interpreter& operator=(const Interpreter&) = delete;
 
   solutions_t solutions;
   RpnVisitor  rpn;

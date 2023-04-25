@@ -111,6 +111,7 @@ Term RpnVisitor::operator()(const UnaryExpr& expr) {
     case Token::Kind::kSlash:
     case Token::Kind::kCaret:
     case Token::Kind::kEqual:
+    case Token::Kind::kQuit:
       throw std::invalid_argument("Unexpected token");
   }
 }

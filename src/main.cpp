@@ -1,20 +1,13 @@
+#include <cmath>
+
 #include "interpreter.h"
 #include "parser.h"
 
-/*
-1. check exceptions - are they the right ones
-2. be specific with user errors - where did it go wrong
-*/
-
-// todo: 42*X^0 = 42*X^0 (each real number is a solution)
-
-// "5 * X^0 + 3 * X^1 + 3 * X^2 = 1 * X^0 + 0 * X^1"
-// "5 * X^0 + 4 * X^1 - 9.3 * X^2 = 1 * X^0"
-// "5 * X^0 + 4 * X^1 = 4 * X^0"
-// "8 * X^0 - 6 * X^1 + 0 * X^2 - 5.6 * X^3 = 3 * X^0"
-
 int main(int argc, char *argv[]) try {
   Parser par;
+
+  std::cerr << std::fixed << (std::pow(2, 62)) << '\n';
+  double lol = utils::exponentiation(2, 63);
 
   if (argc == 1) {
     par.stream(par.prompt());
@@ -23,16 +16,15 @@ int main(int argc, char *argv[]) try {
   } else {
     throw(std::invalid_argument("usage: ./computorv1 [equation]"));
   }
-  par.parse();
+  if (!par.parse()) return 0;
 
   Interpreter interp(par.getTree());
-
   interp.evaluate();
   return 0;
 } catch (std::exception &e) {
   std::cerr << e.what();
   return 1;
 } catch (...) {
-  std::cerr << "unknown error occurred";
+  std::cerr << "unexpected error";
   return 2;
 }

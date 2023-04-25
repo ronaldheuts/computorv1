@@ -11,10 +11,6 @@ class Lexer {
   Lexer();
   Lexer(const std::string &s);
 
-  // void stream(const std::string &s);
-  // void stream(const std::ifstream &ifs);
-  // void stream(const std::istream &is);
-
   Token get(void);
   Token peek(void);
   void  putback(Token);
@@ -22,7 +18,8 @@ class Lexer {
   bool  isReady() const;
 
  private:
-  Lexer(const Lexer &);
+  Lexer(const Lexer &) = delete;
+  Lexer &operator=(const Lexer &) = delete;
 
   Token number(void);
 

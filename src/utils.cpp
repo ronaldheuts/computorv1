@@ -22,7 +22,7 @@ double absval(const double val) { return val < 0 ? -val : val; }
 /// @param n for power
 /// @return b raised to the power of n
 double exponentiation(const double b, const int n) {
-  constexpr double max_double = std::numeric_limits<double>::max();
+  constexpr double int64_max = std::numeric_limits<int64_t>::max();
 
   if (n < 0) {
     throw std::invalid_argument("can not raise to negative power");
@@ -34,6 +34,10 @@ double exponentiation(const double b, const int n) {
   double result{b};
 
   for (int i = 1; i < n; ++i) {
+    // 100 > 10000 /
+    if (result > int64_max / b) {
+      throw std::runtime_error("resulting number too big");
+    }
     result *= b;
   }
   return result;
