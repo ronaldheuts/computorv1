@@ -71,7 +71,7 @@ TEST(exponentiation, baseTwoEponentiationSixtyTwo) {
 }
 
 TEST(exponentiation, baseTwoEponentiationSixtyThree) {
-  EXPECT_THROW(utils::exponentiation(2, 63), std::runtime_error);
+  EXPECT_EQ(utils::exponentiation(2, 63), std::pow(2, 63));
 }
 
 /* square root */

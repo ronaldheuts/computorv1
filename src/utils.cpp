@@ -34,11 +34,10 @@ double exponentiation(const double b, const int n) {
   double result{b};
 
   for (int i = 1; i < n; ++i) {
-    // 100 > 10000 /
-    if (result > int64_max / b) {
+    result = result * b;
+    if (result > int64_max) {
       throw std::runtime_error("resulting number too big");
     }
-    result *= b;
   }
   return result;
 }

@@ -11,6 +11,7 @@ Getting more familiar with c++ and in particular about the following concepts:
 - building a lexer and parser on top of the grammar;
 - hooking the resulting Abstract Syntax Tree of the parser up to an interpreter;
 - using std::variant and std::visit for runtime polymorphism;
+- get more familiar with smart pointers;
 - writing tests using googletest framework.
 
 ## Installation and usage
@@ -18,5 +19,5 @@ Getting more familiar with c++ and in particular about the following concepts:
 git clone git@github.com:ronaldheuts/computorv1.git computorv1
 cd computorv1
 cmake -S . -B build
-cmake --build buid
+cmake --build build
 ```
