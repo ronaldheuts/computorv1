@@ -36,7 +36,7 @@ double exponentiation(const double b, const int n) {
   for (int i = 1; i < n; ++i) {
     result = result * b;
     if (result > int64_max) {
-      throw std::runtime_error("resulting number too big");
+      throw std::runtime_error("integer overflow");
     }
   }
   return result;

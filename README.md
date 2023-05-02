@@ -21,3 +21,12 @@ cd computorv1
 cmake -S . -B build
 cmake --build build
 ```
+
+The subject requires equations to be written in the following form:
+```
+./computorv1 [equation]
+
+example:
+./computorv1 "42 * X^2 - 2 * X^1 + 4 * X^0 = 0"
+```
+ps. a constant must have a variable, but no exponent (in the above example "4 * X^0").
